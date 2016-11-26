@@ -62,23 +62,23 @@ function createNotification(user, event, creator, objectId) {
     switch (event) {
         case 'rate':
             notification.set("description", "You got a new rate");
-            notification.set("redirect", '#');
+            notification.set("redirect", '/');
             break;
         case 'barterRequests':
             notification.set('description', 'You got a new barter request');
-            notification.set("redirect", '.#/barter/' + objectId);
+            notification.set("redirect", '/barter/' + objectId);
             break;
         case 'barterUpUser':
             notification.set('description', 'Your barter request accepted go to dashboard');
-            notification.set("redirect", '.#/dashboard/barter/' + objectId);
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             break;
         case 'barterUpMilestones':
             notification.set('description', 'Your barter have checked');
-            notification.set("redirect", '.#/dashboard/barter/' + objectId);
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             break;
         case 'offerMilestones':
             notification.set('description', 'Your barter have checked');
-            notification.set("redirect", '.#/dashboard/barter/' + objectId);
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             break;
     }
     notification.save(null, {
