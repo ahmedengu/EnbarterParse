@@ -12,6 +12,7 @@ var api = new ParseServer({
     appId: process.env.APP_ID || 'myAppId',
     restAPIKey: "master",
     clientKey: "client",
+    javascriptKey: 'js',
     masterKey: process.env.MASTER_KEY || 'master',
     serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse',
     liveQuery: {
