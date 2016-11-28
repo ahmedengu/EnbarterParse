@@ -40,7 +40,7 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                     console.error("Got an error " + error.code + " : " + error.message);
                 }
             });
-        } else if (request.object.dirty('barterUpUser')) {
+        } else if (request.object.dirty('barterUpUser' && request.object.dirty('barterRequests') && request.object.dirty('barterUpMilestones'))) {
             createNotification(request.object.get('barterUpUser'), "barterUpUser", request.user, request.object.id);
         } else if (request.object.dirty('barterRequests')) {
             createNotification(request.object.get("user"), "barterRequests", request.user, request.object.id);
@@ -62,7 +62,7 @@ function createNotification(user, event, creator, objectId) {
     switch (event) {
         case 'rate':
             notification.set("description", "You got a new rate");
-            notification.set("redirect", '/');
+            notification.set("redirect", '/profile');
             break;
         case 'barterRequests':
             notification.set('description', 'You got a new barter request');
@@ -73,9 +73,6 @@ function createNotification(user, event, creator, objectId) {
             notification.set("redirect", '/dashboard/barter/' + objectId);
             break;
         case 'barterUpMilestones':
-            notification.set('description', 'Your barter have checked');
-            notification.set("redirect", '/dashboard/barter/' + objectId);
-            break;
         case 'offerMilestones':
             notification.set('description', 'Your barter have checked');
             notification.set("redirect", '/dashboard/barter/' + objectId);
