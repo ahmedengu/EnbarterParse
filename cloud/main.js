@@ -40,7 +40,7 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                     console.error("Got an error " + error.code + " : " + error.message);
                 }
             });
-        } else if (request.object.dirty('barterUpUser' && request.object.dirty('barterRequests') && request.object.dirty('barterUpMilestones'))) {
+        } else if (request.object.dirty('barterUpUser') && request.object.dirty('barterUpMilestones') && request.object.dirty('barterRequests')) {
             createNotification(request.object.get('barterUpUser'), "barterUpUser", request.user, request.object.id);
         } else if (request.object.dirty('barterRequests')) {
             createNotification(request.object.get("user"), "barterRequests", request.user, request.object.id);
