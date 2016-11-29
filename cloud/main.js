@@ -1,9 +1,10 @@
-Parse.Cloud.afterSave("_User", function (request) {
-    if (request.object.existed()) {
-    } else {
-        createNotification(request.object, "newUserWelcoming", request.object, request.object.id);
-    }
-});
+// Not working with back4app because it only allow one cloud code
+// Parse.Cloud.afterSave("_User", function (request) {
+//     if (request.object.existed()) {
+//     } else {
+//         createNotification(request.object, "newUserWelcoming", request.object, request.object.id);
+//     }
+// });
 
 Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
