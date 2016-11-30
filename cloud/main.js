@@ -1,11 +1,3 @@
-// Not working with back4app because it only allow one cloud code
-// Parse.Cloud.afterSave("_User", function (request) {
-//     if (request.object.existed()) {
-//     } else {
-//         createNotification(request.object, "newUserWelcoming", request.object, request.object.id);
-//     }
-// });
-
 Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
     } else {
@@ -50,10 +42,6 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             });
         } else if (request.object.dirty('barterUpUser') && request.object.dirty('barterUpMilestones')) {
             createNotification(request.object.get('barterUpUser'), "barterUpUser", request.user, request.object.id);
-            let requests = request.object.get('barterRequests');
-            for (let i = 0; i < requests.length; i++)
-                if (requests[i].user.objectId == request.object.get('barterUpUser').id)
-                    request.object.remove('barterRequests', requests[i]);
         } else if (request.object.dirty('barterRequests')) {
             createNotification(request.object.get("user"), "barterRequests", request.user, request.object.id);
         } else if (request.object.dirty('barterUpMilestones') && request.original.get('barterUpMilestones')) {
