@@ -20,6 +20,10 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                     console.error("Got an error " + error.code + " : " + error.message);
                 }
             });
+            if (request.object.dirty('state') && request.object.get('state') == 'completed') {
+                createNotification(request.object.get('barterUpUser'), "barterCompleted", request.user, request.object.id);
+                createNotification(request.object.get('user'), "barterCompleted", request.object.get('barterUpUser'), request.object.id);
+            }
         }
         else if (request.object.dirty('barterUpRate') && !request.original.get('barterUpRate')) {
             query = new Parse.Query(Parse.User);
@@ -80,6 +84,10 @@ function createNotification(user, event, creator, objectId) {
         case 'newUserWelcoming':
             notification.set('description', 'Welcome to enbarter!, start by browsing');
             notification.set("redirect", '/browse');
+            break;
+        case 'barterCompleted':
+            notification.set('description', 'Congratulations completing your barter');
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             break;
     }
     notification.save(null, {
