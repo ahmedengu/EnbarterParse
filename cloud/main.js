@@ -18,21 +18,17 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
         var errors = checkRequired(request);
         if (errors.length) {
-            response.error(errors);
-            return;
+            return response.error(errors);
         }
     } else {
-        if (!request.user || ((request.user.id != request.object.get('user').id || (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests')))) {
-            response.error("Not Authorized");
-            return;
+        if (!request.user || ((request.user.id != request.object.get('user').id || (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 0 || (request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests'))))) {
+            return response.error("Not Authorized");
         }
         if (request.object.dirty('barterUpUser') && request.original.get('barterUpUser')) {
-            response.error("Not Authorized");
-            return;
+            return response.error("Not Authorized");
         }
         if (request.user.id != request.object.get('user').id && ((request.object.dirty('barterUpMilestones') && request.original.get('barterUpMilestones') || (request.object.dirty('barterUpRate') || request.object.dirty('barterUpReview') || request.object.dirty('barterUpFinalPic') || request.object.dirty('barterUpDeadline'))))) {
-            response.error("Not Authorized");
-            return;
+            return response.error("Not Authorized");
         }
 
         var dirtyKeys = request.object.dirtyKeys();
@@ -43,8 +39,7 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                 flag = true;
         }
         if (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id && flag) {
-            response.error("Not Authorized");
-            return;
+            return response.error("Not Authorized");
         }
         if (request.object.dirty('offerRate') && !request.original.get('offerRate')) {
             query = new Parse.Query(Parse.User);
@@ -104,7 +99,7 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             createNotification(request.object.get("barterUpUser"), "offerMilestones", request.user, request.object.id);
         }
     }
-    response.success();
+    return response.success();
 });
 
 function createNotification(user, event, creator, objectId) {
