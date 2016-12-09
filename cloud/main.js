@@ -1,8 +1,14 @@
+Parse.Cloud.afterSave("_User", function (request) {
+    if (!request.object.existed()) {
+        createNotification(request.object, "newUserWelcoming", request.object, request.object.id);
+    }
+});
+
 function checkRequired(request) {
-    let dirtyKeys = request.object.dirtyKeys();
-    let required = ['barterTitle', 'barterDescription', 'offerCategory', 'offerDescription', 'offerMilestones', 'offerDeadline', 'seekCategory', 'seekDescription', 'seekDeadline', 'user', 'state', 'words'];
-    let errors = "";
-    for (let i = 0; i < required.length; i++) {
+    var dirtyKeys = request.object.dirtyKeys();
+    var required = ['barterTitle', 'barterDescription', 'offerCategory', 'offerDescription', 'offerMilestones', 'offerDeadline', 'seekCategory', 'seekDescription', 'seekDeadline', 'user', 'state', 'words'];
+    var errors = "";
+    for (var i = 0; i < required.length; i++) {
         if (dirtyKeys.indexOf(required[i]) == -1)
             errors += required[i] + " Is required! ";
     }
@@ -10,13 +16,13 @@ function checkRequired(request) {
 }
 Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
-        let errors = checkRequired(request);
+        var errors = checkRequired(request);
         if (errors.length) {
             response.error(errors);
             return;
         }
     } else {
-        if (!request.user || ((request.user.id != request.object.get('user').id || request.user.id != request.object.get('barterUpUser').id) && !(request.object.dirtyKeys == 1 && request.object.dirty('barterRequests')))) {
+        if (!request.user || ((request.user.id != request.object.get('user').id || (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests')))) {
             response.error("Not Authorized");
             return;
         }
@@ -29,14 +35,14 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             return;
         }
 
-        let dirtyKeys = request.object.dirtyKeys();
-        let flag = false;
-        let allowed = ['barterUpMilestones', 'barterUpRate', 'barterUpReview', 'barterUpFinalPic', 'barterUpDeadline'];
-        for (let i = 0; i < dirtyKeys.length; i++) {
+        var dirtyKeys = request.object.dirtyKeys();
+        var flag = false;
+        var allowed = ['barterUpMilestones', 'barterUpRate', 'barterUpReview', 'barterUpFinalPic', 'barterUpDeadline'];
+        for (var i = 0; i < dirtyKeys.length; i++) {
             if (allowed.indexOf(dirtyKeys[i]) == -1)
                 flag = true;
         }
-        if (request.user.id != request.object.get('barterUpUser').id && flag) {
+        if (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id && flag) {
             response.error("Not Authorized");
             return;
         }
