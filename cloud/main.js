@@ -21,13 +21,10 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             return response.error(errors);
         }
     } else {
-        if (!request.user || ((request.user.id != request.object.get('user').id || (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 0 || (request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests'))))) {
+        if (!request.user || ((request.user.id != request.object.get('user').id && (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 0 || (request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests'))))) {
             return response.error("Not Authorized");
         }
         if (request.object.dirty('barterUpUser') && request.original.get('barterUpUser')) {
-            return response.error("Not Authorized");
-        }
-        if (request.user.id != request.object.get('user').id && ((request.object.dirty('barterUpMilestones') && request.original.get('barterUpMilestones') || (request.object.dirty('barterUpRate') || request.object.dirty('barterUpReview') || request.object.dirty('barterUpFinalPic') || request.object.dirty('barterUpDeadline'))))) {
             return response.error("Not Authorized");
         }
 
@@ -38,7 +35,10 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             if (allowed.indexOf(dirtyKeys[i]) == -1)
                 flag = true;
         }
-        if (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id && flag) {
+        if (request.original.get('barterUpUser') && request.user.id == request.original.get('barterUpUser').id && flag) {
+            return response.error("Not Authorized");
+        }
+        if (request.user.id == request.original.get('user').id && !flag) {
             return response.error("Not Authorized");
         }
         if (request.object.dirty('offerRate') && !request.original.get('offerRate')) {
