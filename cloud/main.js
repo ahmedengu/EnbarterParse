@@ -97,6 +97,10 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             createNotification(request.object.get("user"), "barterUpMilestones", request.user, request.object.id);
         } else if (request.object.dirty('offerMilestones') && request.original.get('barterUpMilestones')) {
             createNotification(request.object.get("barterUpUser"), "offerMilestones", request.user, request.object.id);
+        } else if (request.object.dirty('offerFinalPic') && !request.original.get('offerFinalPic')) {
+            createNotification(request.object.get("barterUpUser"), "finalUploaded", request.user, request.object.id);
+        } else if (request.object.dirty('barterUpFinalPic') && !request.original.get('barterUpFinalPic')) {
+            createNotification(request.object.get("user"), "finalUploaded", request.user, request.object.id);
         }
     }
     return response.success();
@@ -132,6 +136,10 @@ function createNotification(user, event, creator, objectId) {
             break;
         case 'barterCompleted':
             notification.set('description', 'Congratulations completing your barter');
+            notification.set("redirect", '/dashboard/barter/' + objectId);
+            break;
+        case 'finalUploaded':
+            notification.set('description', 'Complete project uploaded');
             notification.set("redirect", '/dashboard/barter/' + objectId);
             break;
     }
