@@ -37,8 +37,8 @@ mongo admin
 
 db.createUser(
   {
-    user: "mongoadmin",
-    pwd: "68b1f5a1cd1f611123e0cc19e985aafa7032e910787e0dee5023181036de8501f5b8d0080d37994d5bce0f396e8ebf39ce43dd60bc2c8f35",
+    user: "admin",
+    pwd: "68b1f5a1cd1f611123e0cc19e",
     roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]
   }
 )
