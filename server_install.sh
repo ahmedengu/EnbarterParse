@@ -1,5 +1,12 @@
+#!/usr/bin/env bash
+
 sudo apt-get update
 sudo apt-get upgrade
+curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+sudo add-apt-repository ppa:ondrej/php
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+sudo apt-get update
 
 wget -O- https://raw.github.com/ajenti/ajenti/1.x/scripts/install-ubuntu.sh | sudo sh
 ufw allow 8000
@@ -9,31 +16,22 @@ sudo apt-get install ajenti-v ajenti-v-nginx ajenti-v-mail ajenti-v-ftp-pureftpd
 sudo apt-get install bind9
 sudo apt-get install fail2ban
 
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
-sudo apt-get update
-sudo apt-get install -y mongodb-org
-
-sudo apt-get install python-pip build-essential python-dev libssl-dev
+sudo apt-get install -y mongodb-org python-pip build-essential python-dev libssl-dev
 sudo pip install pymongo
 
-sudo apt-get install mysql-server
+sudo apt-get install -y mysql-server
 sudo mysql_secure_installation
 sudo mysql_install_db
 
-sudo apt-get install nginx
 
-curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-sudo apt-get install nodejs
-
-apt-get install supervisor
+sudo apt-get install -y nodejs
 
 
-sudo apt-get install git
-sudo apt-get install phantomjs
-sudo apt-get -y install redis-server
 
+sudo apt-get install -y git phantomjs redis-server
+#sudo apt-get install -y redis-server
 
+service ajenti restart
 
 mongo admin
 
@@ -52,7 +50,7 @@ db.createUser(
       user: "enbarterUser",
       pwd: "1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe",
       roles: [
-         { role: "readWrite", db: "newdb" },
+         { role: "readWrite", db: "enbarterDB" },
       ]
     }
 )
