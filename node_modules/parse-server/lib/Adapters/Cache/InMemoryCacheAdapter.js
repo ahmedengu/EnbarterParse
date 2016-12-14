@@ -23,7 +23,7 @@ var InMemoryCacheAdapter = exports.InMemoryCacheAdapter = function () {
     value: function get(key) {
       var _this = this;
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         var record = _this.cache.get(key);
         if (record == null) {
           return resolve(null);

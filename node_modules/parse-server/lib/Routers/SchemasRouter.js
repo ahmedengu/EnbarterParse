@@ -27,8 +27,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 // schemas.js
 
-var express = require('express'),
-    Parse = require('parse/node').Parse,
+var Parse = require('parse/node').Parse,
     SchemaController = require('../Controllers/SchemaController');
 
 function classNameMismatchResponse(bodyClass, pathClass) {

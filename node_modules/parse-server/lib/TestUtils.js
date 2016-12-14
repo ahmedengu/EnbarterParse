@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.destroyAllDataPermanently = undefined;
+exports.destroyAllDataPermanently = destroyAllDataPermanently;
 
 var _cache = require('./cache');
 
@@ -25,5 +25,3 @@ function destroyAllDataPermanently() {
     }
   }));
 }
-
-exports.destroyAllDataPermanently = destroyAllDataPermanently;

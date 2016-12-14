@@ -13,9 +13,9 @@ var _ClassesRouter2 = require('./ClassesRouter');
 
 var _ClassesRouter3 = _interopRequireDefault(_ClassesRouter2);
 
-var _PromiseRouter = require('../PromiseRouter');
+var _node = require('parse/node');
 
-var _PromiseRouter2 = _interopRequireDefault(_PromiseRouter);
+var _node2 = _interopRequireDefault(_node);
 
 var _rest = require('../rest');
 
@@ -83,11 +83,11 @@ var SessionsRouter = exports.SessionsRouter = function (_ClassesRouter) {
     value: function handleMe(req) {
       // TODO: Verify correct behavior
       if (!req.info || !req.info.sessionToken) {
-        throw new Parse.Error(Parse.Error.INVALID_SESSION_TOKEN, 'Session token required.');
+        throw new _node2.default.Error(_node2.default.Error.INVALID_SESSION_TOKEN, 'Session token required.');
       }
       return _rest2.default.find(req.config, _Auth2.default.master(req.config), '_Session', { sessionToken: req.info.sessionToken }, undefined, req.info.clientSDK).then(function (response) {
         if (!response.results || response.results.length == 0) {
-          throw new Parse.Error(Parse.Error.INVALID_SESSION_TOKEN, 'Session token not found.');
+          throw new _node2.default.Error(_node2.default.Error.INVALID_SESSION_TOKEN, 'Session token not found.');
         }
         return {
           response: response.results[0]
@@ -103,7 +103,7 @@ var SessionsRouter = exports.SessionsRouter = function (_ClassesRouter) {
       // Issue #2720
       // Calling without a session token would result in a not found user
       if (!user) {
-        throw new Parse.Error(Parse.Error.OBJECT_NOT_FOUND, 'invalid session');
+        throw new _node2.default.Error(_node2.default.Error.OBJECT_NOT_FOUND, 'invalid session');
       }
       var expiresAt = config.generateSessionExpiresAt();
       var sessionData = {
@@ -118,7 +118,7 @@ var SessionsRouter = exports.SessionsRouter = function (_ClassesRouter) {
         },
         restricted: false,
         installationId: req.auth.installationId,
-        expiresAt: Parse._encode(expiresAt)
+        expiresAt: _node2.default._encode(expiresAt)
       };
       var create = new _RestWrite2.default(config, masterAuth, '_Session', null, sessionData);
       return create.execute().then(function () {
@@ -128,7 +128,7 @@ var SessionsRouter = exports.SessionsRouter = function (_ClassesRouter) {
         }, {
           sessionToken: { __op: 'Delete' }
         });
-      }).then(function (res) {
+      }).then(function () {
         return Promise.resolve({ response: sessionData });
       });
     }

@@ -8,6 +8,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+/*eslint no-unused-vars: "off"*/
 var CacheAdapter = exports.CacheAdapter = function () {
   function CacheAdapter() {
     _classCallCheck(this, CacheAdapter);

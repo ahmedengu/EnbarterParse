@@ -13,14 +13,6 @@ var _ClassesRouter2 = require('./ClassesRouter');
 
 var _ClassesRouter3 = _interopRequireDefault(_ClassesRouter2);
 
-var _PromiseRouter = require('../PromiseRouter');
-
-var _PromiseRouter2 = _interopRequireDefault(_PromiseRouter);
-
-var _rest = require('../rest');
-
-var _rest2 = _interopRequireDefault(_rest);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }

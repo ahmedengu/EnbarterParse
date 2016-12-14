@@ -40,7 +40,7 @@ var HTTPResponse = function HTTPResponse(response, body) {
     if (!_data) {
       try {
         _data = JSON.parse(getText());
-      } catch (e) {}
+      } catch (e) {/* */}
     }
     return _data;
   };

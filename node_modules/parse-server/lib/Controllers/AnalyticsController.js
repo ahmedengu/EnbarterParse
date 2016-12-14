@@ -39,7 +39,7 @@ var AnalyticsController = exports.AnalyticsController = function (_AdaptableCont
         return _this2.adapter.appOpened(req.body, req);
       }).then(function (response) {
         return { response: response || {} };
-      }).catch(function (err) {
+      }).catch(function () {
         return { response: {} };
       });
     }
@@ -52,7 +52,7 @@ var AnalyticsController = exports.AnalyticsController = function (_AdaptableCont
         return _this3.adapter.trackEvent(req.params.eventName, req.body, req);
       }).then(function (response) {
         return { response: response || {} };
-      }).catch(function (err) {
+      }).catch(function () {
         return { response: {} };
       });
     }

@@ -80,7 +80,7 @@ var CacheController = exports.CacheController = function (_AdaptableController) 
   _inherits(CacheController, _AdaptableController);
 
   function CacheController(adapter, appId) {
-    var options = arguments.length <= 2 || arguments[2] === undefined ? {} : arguments[2];
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
     _classCallCheck(this, CacheController);
 

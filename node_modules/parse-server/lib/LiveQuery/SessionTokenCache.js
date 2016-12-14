@@ -25,8 +25,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var SessionTokenCache = function () {
   function SessionTokenCache() {
-    var timeout = arguments.length <= 0 || arguments[0] === undefined ? 30 * 24 * 60 * 60 * 1000 : arguments[0];
-    var maxSize = arguments.length <= 1 || arguments[1] === undefined ? 10000 : arguments[1];
+    var timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 30 * 24 * 60 * 60 * 1000;
+    var maxSize = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10000;
 
     _classCallCheck(this, SessionTokenCache);
 

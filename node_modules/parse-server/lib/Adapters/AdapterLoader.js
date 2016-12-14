@@ -23,6 +23,7 @@ function loadAdapter(adapter, defaultAdapter, options) {
       }
     }
   } else if (typeof adapter === "string") {
+    /* eslint-disable */
     adapter = require(adapter);
     // If it's define as a module, get the default
     if (adapter.default) {

@@ -16,7 +16,7 @@ sudo apt-get install ajenti-v ajenti-v-nginx ajenti-v-mail ajenti-v-ftp-pureftpd
 sudo apt-get install bind9
 sudo apt-get install fail2ban
 
-sudo apt-get install -y mongodb-org python-pip build-essential python-dev libssl-dev
+sudo apt-get install -y mongodb-org python-pip build-essential python-dev libssl-dev unzip
 sudo pip install pymongo
 
 sudo apt-get install -y mysql-server
@@ -31,7 +31,16 @@ sudo apt-get install -y nodejs
 sudo apt-get install -y git phantomjs redis-server
 #sudo apt-get install -y redis-server
 
+ssh-keygen -t rsa
+
+sudo apt-get install -y gitolite3
+#/root/.ssh/id_rsa.pub
 service ajenti restart
+
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
 
 mongo admin
 
@@ -72,6 +81,9 @@ https://gist.github.com/thoop/8165802
 
 sudo nano /etc/redis/redis.conf
 requirepass 16b5c2300edd0a70b824714fea0e8144e177c888e0ef0977a0b77943d525ef6c
+
+
+https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
 "
 
 

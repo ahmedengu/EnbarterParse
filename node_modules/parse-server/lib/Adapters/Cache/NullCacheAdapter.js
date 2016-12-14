@@ -9,25 +9,25 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var NullCacheAdapter = exports.NullCacheAdapter = function () {
-  function NullCacheAdapter(ctx) {
+  function NullCacheAdapter() {
     _classCallCheck(this, NullCacheAdapter);
   }
 
   _createClass(NullCacheAdapter, [{
     key: "get",
-    value: function get(key) {
-      return new Promise(function (resolve, _) {
+    value: function get() {
+      return new Promise(function (resolve) {
         return resolve(null);
       });
     }
   }, {
     key: "put",
-    value: function put(key, value, ttl) {
+    value: function put() {
       return Promise.resolve();
     }
   }, {
     key: "del",
-    value: function del(key) {
+    value: function del() {
       return Promise.resolve();
     }
   }, {

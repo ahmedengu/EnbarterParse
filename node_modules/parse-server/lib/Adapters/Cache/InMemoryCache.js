@@ -12,8 +12,8 @@ var DEFAULT_CACHE_TTL = 5 * 1000;
 
 var InMemoryCache = exports.InMemoryCache = function () {
   function InMemoryCache(_ref) {
-    var _ref$ttl = _ref.ttl;
-    var ttl = _ref$ttl === undefined ? DEFAULT_CACHE_TTL : _ref$ttl;
+    var _ref$ttl = _ref.ttl,
+        ttl = _ref$ttl === undefined ? DEFAULT_CACHE_TTL : _ref$ttl;
 
     _classCallCheck(this, InMemoryCache);
 
@@ -43,7 +43,7 @@ var InMemoryCache = exports.InMemoryCache = function () {
     value: function put(key, value) {
       var _this = this;
 
-      var ttl = arguments.length <= 2 || arguments[2] === undefined ? this.ttl : arguments[2];
+      var ttl = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.ttl;
 
       if (ttl < 0 || isNaN(ttl)) {
         ttl = NaN;

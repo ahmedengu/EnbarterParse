@@ -15,7 +15,6 @@ var LiveQueryController = exports.LiveQueryController = function () {
   function LiveQueryController(config) {
     _classCallCheck(this, LiveQueryController);
 
-    var classNames = void 0;
     // If config is empty, we just assume no classs needs to be registered as LiveQuery
     if (!config || !config.classNames) {
       this.classNames = new Set();
