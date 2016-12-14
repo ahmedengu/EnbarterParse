@@ -8,20 +8,20 @@ var server = prerender({
     workers: 4,
     iterations: 10,
     phantomBasePort: process.env.PHANTOM_CLUSTER_BASE_PORT || 12300,
-    accessLog: {
-        // Check out the file-stream-rotator docs for parameters
-        fileStreamRotator: {
-            filename: 'logs/access-%DATE%.log',
-            frequency: 'daily',
-            date_format: 'YYYY-MM-DD',
-            verbose: false
-        },
-
-        // Check out the morgan docs for the available formats
-        morgan: {
-            format: 'combined'
-        }
-    },
+    // accessLog: {
+    //     // Check out the file-stream-rotator docs for parameters
+    //     fileStreamRotator: {
+    //         filename: 'logs/access-%DATE%.log',
+    //         frequency: 'daily',
+    //         date_format: 'YYYY-MM-DD',
+    //         verbose: false
+    //     },
+    //
+    //     // Check out the morgan docs for the available formats
+    //     morgan: {
+    //         format: 'combined'
+    //     }
+    // },
     cookiesEnabled: true,
     logRequests: true,
     pageDoneCheckTimeout: 300,
@@ -45,6 +45,6 @@ server.use(prerender.logger());
 server.use(prerender.httpHeaders());
 // server.use(prerender.inMemoryHtmlCache());
 // server.use(prerender.s3HtmlCache());
-server.use(require('prerender-access-log'));
+// server.use(require('prerender-access-log'));
 
 server.start();
