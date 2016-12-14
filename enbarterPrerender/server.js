@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 var prerender = require('./lib');
 process.env.ALLOWED_DOMAINS = 'www.enbarter.com,enbarter.com,enbarterdev.ml,www.enbarterdev.ml';
-process.env.CACHE_ROOT_DIR = '/srv/enbarterPrerender/cache';
-process.env.CACHE_LIVE_TIME = 10000;
+process.env.CACHE_MAXSIZE = 10000;
 
 var server = prerender({
     workers: 4,
@@ -20,11 +19,10 @@ var server = prerender({
 });
 
 
-server.use(require('prerender-compressed-file-cache'));
-
 server.use(prerender.sendPrerenderHeader());
 server.use(prerender.whitelist());
 server.use(prerender.logger());
 server.use(prerender.httpHeaders());
+server.use(prerender.inMemoryHtmlCache());
 
 server.start();

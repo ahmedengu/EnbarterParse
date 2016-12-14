@@ -12,7 +12,7 @@ wget -O- https://raw.github.com/ajenti/ajenti/1.x/scripts/install-ubuntu.sh | su
 ufw allow 8000
 
 sudo apt-get autoremove && sudo apt-get remove apache2*
-sudo apt-get install ajenti-v ajenti-v-nginx ajenti-v-mail ajenti-v-ftp-pureftpd ajenti-v-nodejs ajenti-v-php7.0-fpm php7.0-mysql
+sudo apt-get install ajenti-v ajenti-v-nginx ajenti-v-mail ajenti-v-ftp-pureftpd ajenti-v-nodejs ajenti-v-php7.0-fpm php7.0-mysql php7.0-mbstring php7.0-cli php7.0-curl php7.0-dom
 sudo apt-get install bind9
 sudo apt-get install fail2ban
 

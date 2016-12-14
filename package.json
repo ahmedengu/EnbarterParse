@@ -6,6 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "~1.15.2",
+    "cache-manager": "^2.2.0",
     "cookie-parser": "~1.4.3",
     "express": "~4.11.x",
     "imagemagick": "~0.1.3",
