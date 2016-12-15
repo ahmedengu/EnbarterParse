@@ -32,7 +32,7 @@ var api = new ParseServer({
     filesAdapter: {
         module: "parse-server-fs-adapter",
         options: {
-            filesSubDirectory: ""
+            filesSubDirectory: __dirname +"/files"
         }
     },
     emailAdapter: {
