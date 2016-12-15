@@ -9,6 +9,8 @@ var app = express();
 app.use('/public', express.static(path.join(__dirname, '/public')));
 
 var api = new ParseServer({
+    appName: 'Enbarter',
+    publicServerURL: 'http://enbarter.com',
     databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@178.62.247.181:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
@@ -32,8 +34,32 @@ var api = new ParseServer({
         options: {
             filesSubDirectory: ""
         }
+    },
+    emailAdapter: {
+        module: "simple-parse-smtp-adapter",
+        options: {
+            fromAddress: 'ahmedengu@enbarterdev.ml',
+            user: 'ahmedengu@enbarterdev.ml',
+            password: '123456789',
+            host: 'mail.enbarterdev.ml',
+            isSSL: false, //True or false if you are using ssl
+            port: 25, //SSL port or another port
+            name: 'enbarterdev.ml', //  optional, used for identifying to the server
+            //Somtimes the user email is not in the 'email' field, the email is search first in
+            //email field, then in username field, if you have the user email in another field
+            //You can specify here
+            emailField: 'email',
+            templates: {
+                //This template is used only for reset password email
+                resetPassword: {
+                    //Path to your template
+                    template: __dirname + '/views/email/reset-password',
+                    //Subject for this email
+                    subject: 'Reset your password'
+                }
+            }
+        }
     }
-
 });
 
 
