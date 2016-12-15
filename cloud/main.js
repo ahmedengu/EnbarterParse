@@ -14,6 +14,40 @@ function checkRequired(request) {
     }
     return errors;
 }
+Parse.Cloud.beforeSave("BarterDashboard", function (request, response) {
+    if (request.object.isNew()) {
+    } else {
+        if (request.object.dirty('barterUpUser') && request.original.get('barterUpUser')) {
+            return response.error("Not Authorized");
+        }
+
+        var dirtyKeys = request.object.dirtyKeys();
+        var flag = false;
+        var allowed = ['barterUpMilestones', 'barterUpFinalPic', 'barterUpDeadline'];
+        for (var i = 0; i < dirtyKeys.length; i++) {
+            if (allowed.indexOf(dirtyKeys[i]) == -1)
+                flag = true;
+        }
+        if (request.original.get('barterUpUser') && request.user.id == request.original.get('barterUpUser').id && flag) {
+            return response.error("Not Authorized");
+        }
+        if (request.user.id == request.original.get('user').id && !flag) {
+            return response.error("Not Authorized");
+        }
+        if (request.object.dirty('barterUpUser') && request.object.dirty('barterUpMilestones')) {
+            createNotification(request.object.get('barterUpUser'), "barterUpUser", request.user, request.object.id);
+        } else if (request.object.dirty('barterUpMilestones') && request.original.get('barterUpMilestones')) {
+            createNotification(request.object.get("user"), "barterUpMilestones", request.user, request.object.id);
+        } else if (request.object.dirty('offerMilestones') && request.original.get('barterUpMilestones')) {
+            createNotification(request.object.get("barterUpUser"), "offerMilestones", request.user, request.object.id);
+        } else if (request.object.dirty('offerFinalPic') && !request.original.get('offerFinalPic')) {
+            createNotification(request.object.get("barterUpUser"), "finalUploaded", request.user, request.object.id);
+        } else if (request.object.dirty('barterUpFinalPic') && !request.original.get('barterUpFinalPic')) {
+            createNotification(request.object.get("user"), "finalUploaded", request.user, request.object.id);
+        }
+    }
+    return response.success();
+});
 Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
         var errors = checkRequired(request);
