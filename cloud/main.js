@@ -160,7 +160,7 @@ function createNotification(user, event, creator, objectId) {
     switch (event) {
         case 'rate':
             notification.set("description", "You got a new rate");
-            notification.set("redirect", '/#!/profile');
+            notification.set("redirect", '/profile');
 
             subject = 'You got a new rate';
             message = 'Hi, <br> You got a new rate <br> http://enbarter.com/' + notification.get('redirect');
@@ -169,14 +169,14 @@ function createNotification(user, event, creator, objectId) {
             break;
         case 'barterRequests':
             notification.set('description', 'You got a new barter request');
-            notification.set("redirect", '/#!/barter/' + objectId);
+            notification.set("redirect", '/barter/' + objectId);
             subject = 'You got a new barter request';
             message = 'Hi, <br> You got a new barter request <br> http://enbarter.com/' + notification.get('redirect');
             sendMailToUser(notification.get('user'), message, subject);
             break;
         case 'barterUpUser':
             notification.set('description', 'Your barter request accepted go to dashboard');
-            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Your barter request accepted go to dashboard';
             message = 'Hi, <br> Your barter request accepted go to dashboard <br> http://enbarter.com/' + notification.get('redirect');
             sendMailToUser(notification.get('user'), message, subject);
@@ -185,25 +185,25 @@ function createNotification(user, event, creator, objectId) {
         case 'barterUpMilestones':
         case 'offerMilestones':
             notification.set('description', 'Your barter have checked');
-            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Your barter have checked';
             message = 'Hi, <br> Your barter have checked <br> http://enbarter.com/' + notification.get('redirect');
             sendMailToUser(notification.get('user'), message, subject);
             break;
         case 'newUserWelcoming':
             notification.set('description', 'Welcome to enbarter!, start by browsing');
-            notification.set("redirect", '/#!/browse');
+            notification.set("redirect", '/browse');
             break;
         case 'barterCompleted':
             notification.set('description', 'Congratulations completing your barter');
-            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Congratulations completing your barter';
             message = 'Hi, <br> Congratulations completing your barter <br> http://enbarter.com/' + notification.get('redirect');
             sendMailToUser(notification.get('user'), message, subject);
             break;
         case 'finalUploaded':
             notification.set('description', 'Complete project uploaded');
-            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
+            notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Complete project uploaded';
             message = 'Hi, <br> Complete project uploaded <br> http://enbarter.com/' + notification.get('redirect');
             sendMailToUser(notification.get('user'), message, subject);
@@ -225,7 +225,7 @@ function sendMailToUser(user, message, subject) {
         });
     else {
         var query = new Parse.Query(Parse.User);
-        query.get(user, {
+        query.get(user.id, {
                 useMasterKey: true,
                 success: function (result) {
                     sendSmtpMail({
