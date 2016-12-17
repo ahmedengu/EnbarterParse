@@ -7,6 +7,7 @@ var path = require('path');
 const resolve = require('path').resolve;
 
 var app = express();
+app.use('/public', express.static(path.join(__dirname, '/public')));
 
 var api = new ParseServer({
     appName: 'Enbarter',
@@ -16,6 +17,7 @@ var api = new ParseServer({
     appId: 'EnbarterApp',
     javascriptKey: '28e0691b32ab',
     masterKey: 'fb4b98ea158cbbdd32c366682f280533d89374a2fa8908186b4478ff295b96f77096f54eabc9a61b956237d817fb04ea6498c73c4cd9ec14e1ade7cc81136b0',
+    restAPIKey: "1df92f3ebeb37b888c55ea9edd4fedf63a718d73a0556fb49d5cdde63c567dc31df92f3ebeb37b888c55ea9edd4fedf63a718d73a0556fb49d5cdde63c567dc3",
     serverURL: 'http://api.enbarterdev.ml/v1',
     liveQuery: {
         classNames: ["BarterDashboard", "Chat", "Notification"]
