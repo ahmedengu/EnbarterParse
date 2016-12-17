@@ -53,7 +53,7 @@ var api = new ParseServer({
     emailAdapter: {
         module: "simple-parse-smtp-adapter",
         options: {
-            fromAddress: 'ahmedengu@enbarterdev.ml',
+            fromAddress: 'Enbarter <ahmedengu@enbarterdev.ml>',
             user: 'ahmedengu@enbarterdev.ml',
             password: '123456789',
             host: 'mail.enbarterdev.ml',
