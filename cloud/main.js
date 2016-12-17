@@ -270,7 +270,7 @@ Parse.Cloud.job("sitemapGenerator", function (request, status) {
                     fs.appendFileSync(dir, '   <url>\n', encoding = 'utf8');
                     fs.appendFileSync(dir, '       <loc>http://enbarter.com/#!/barter/' + r.id + '</loc>\n', encoding = 'utf8');
                     fs.appendFileSync(dir, '       <lastmod>' + r.updatedAt + '</lastmod>\n', encoding = 'utf8');
-                    fs.appendFileSync(dir, '       <changefreq>monthly</changefreq>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '       <changefreq>weakly</changefreq>\n', encoding = 'utf8');
                     fs.appendFileSync(dir, '       <priority>0.8</priority>\n', encoding = 'utf8');
                     fs.appendFileSync(dir, '   </url>\n', encoding = 'utf8');
                 }
