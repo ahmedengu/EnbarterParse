@@ -4,6 +4,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var express = require('express');
 var ParseServer = require('parse-server').ParseServer;
 var path = require('path');
+const resolve = require('path').resolve;
 
 var app = express();
 
@@ -25,12 +26,11 @@ var api = new ParseServer({
     revokeSessionOnPasswordReset: true,
     allowClientClassCreation: false,
     enableAnonymousUsers: false,
-    facebookAppIds: ['1394780183887567'],
     sessionLength: 2592000,
     verifyUserEmails: true,
     emailVerifyTokenValidityDuration: 24 * 60 * 60,
     passwordPolicy: {
-        validatorPattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})/,
+        validatorPattern: /^(?=.{8,})/,
         doNotAllowUsername: true,
         maxPasswordAge: 1000,
         maxPasswordHistory: 5,
@@ -57,7 +57,7 @@ var api = new ParseServer({
             fromAddress: 'ahmedengu@enbarterdev.ml',
             user: 'ahmedengu@enbarterdev.ml',
             password: '123456789',
-            host: 'enbarterdev.ml',
+            host: 'mail.enbarterdev.ml',
             isSSL: true, //True or false if you are using ssl
             port: 465, //SSL port or another port
             name: 'enbarterdev.ml', //  optional, used for identifying to the server
@@ -69,6 +69,10 @@ var api = new ParseServer({
                 resetPassword: {
                     template: __dirname + '/views/email/reset-password',
                     subject: 'Reset your password'
+                },
+                verifyEmail: {
+                    template: __dirname + '/views/email/verify-email',
+                    subject: 'Verify Email'
                 }
             }
         }

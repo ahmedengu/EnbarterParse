@@ -149,32 +149,32 @@ function createNotification(user, event, creator, objectId) {
     switch (event) {
         case 'rate':
             notification.set("description", "You got a new rate");
-            notification.set("redirect", '/profile');
+            notification.set("redirect", '/#!/profile');
             break;
         case 'barterRequests':
             notification.set('description', 'You got a new barter request');
-            notification.set("redirect", '/barter/' + objectId);
+            notification.set("redirect", '/#!/barter/' + objectId);
             break;
         case 'barterUpUser':
             notification.set('description', 'Your barter request accepted go to dashboard');
-            notification.set("redirect", '/dashboard/barter/' + objectId);
+            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
             break;
         case 'barterUpMilestones':
         case 'offerMilestones':
             notification.set('description', 'Your barter have checked');
-            notification.set("redirect", '/dashboard/barter/' + objectId);
+            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
             break;
         case 'newUserWelcoming':
             notification.set('description', 'Welcome to enbarter!, start by browsing');
-            notification.set("redirect", '/browse');
+            notification.set("redirect", '/#!/browse');
             break;
         case 'barterCompleted':
             notification.set('description', 'Congratulations completing your barter');
-            notification.set("redirect", '/dashboard/barter/' + objectId);
+            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
             break;
         case 'finalUploaded':
             notification.set('description', 'Complete project uploaded');
-            notification.set("redirect", '/dashboard/barter/' + objectId);
+            notification.set("redirect", '/#!/dashboard/barter/' + objectId);
             break;
     }
     notification.save(null, {
