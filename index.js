@@ -31,7 +31,6 @@ var api = new ParseServer({
     emailVerifyTokenValidityDuration: 24 * 60 * 60,
     passwordPolicy: {
         validatorPattern: /^(?=.{8,})/,
-        doNotAllowUsername: true,
         maxPasswordAge: 1000,
         maxPasswordHistory: 5,
         resetTokenValidityDuration: 24 * 60 * 60
