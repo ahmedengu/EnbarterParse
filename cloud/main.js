@@ -250,31 +250,37 @@ Parse.Cloud.job("sitemapGenerator", function (request, status) {
         success: function (results) {
             status.message("Got result");
             var fs = require('fs');
-            fs.open('public/sitemap.xml', 'w', function (err, fd) {
+            var dir = __dirname + '/../public/sitemap.xml';
+            fs.open(dir, 'w+', function (err, fd) {
                 if (err) {
-                    return status.error("Got an error " + error.code + " : " + error.message);
+                    status.error("Got an error " + err);
                 }
 
-                fs.appendFileSync('public/sitemap.xml', '<?xml version="1.0" encoding="UTF-8"?>\n', encoding = 'utf8');
-                fs.appendFileSync('public/sitemap.xml', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n', encoding = 'utf8');
-                fs.appendFileSync('public/sitemap.xml', '   <url>\n', encoding = 'utf8');
-                fs.appendFileSync('public/sitemap.xml', '       <loc>http://enbarter.com</loc>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '<?xml version="1.0" encoding="UTF-8"?>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '   <url>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <loc>http://enbarter.com</loc>\n', encoding = 'utf8');
                 let updatedAt = (results.length) ? results[0].updatedAt : new Date();
-                fs.appendFileSync('public/sitemap.xml', '       <lastmod>' + updatedAt + '</lastmod>\n', encoding = 'utf8');
-                fs.appendFileSync('public/sitemap.xml', '       <changefreq>daily</changefreq>\n', encoding = 'utf8');
-                fs.appendFileSync('public/sitemap.xml', '       <priority>1.0</priority>\n', encoding = 'utf8');
-                fs.appendFileSync('public/sitemap.xml', '   </url>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <lastmod>' + updatedAt + '</lastmod>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <changefreq>daily</changefreq>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <priority>1.0</priority>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '   </url>\n', encoding = 'utf8');
 
                 for (let r of results) {
-                    fs.appendFileSync('public/sitemap.xml', '   <url>\n', encoding = 'utf8');
-                    fs.appendFileSync('public/sitemap.xml', '       <loc>http://enbarter.com/#!/barter/' + r.id + '</loc>\n', encoding = 'utf8');
-                    fs.appendFileSync('public/sitemap.xml', '       <lastmod>' + r.updatedAt + '</lastmod>\n', encoding = 'utf8');
-                    fs.appendFileSync('public/sitemap.xml', '       <changefreq>monthly</changefreq>\n', encoding = 'utf8');
-                    fs.appendFileSync('public/sitemap.xml', '       <priority>0.8</priority>\n', encoding = 'utf8');
-                    fs.appendFileSync('public/sitemap.xml', '   </url>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '   <url>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '       <loc>http://enbarter.com/#!/barter/' + r.id + '</loc>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '       <lastmod>' + r.updatedAt + '</lastmod>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '       <changefreq>monthly</changefreq>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '       <priority>0.8</priority>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '   </url>\n', encoding = 'utf8');
                 }
-                fs.appendFileSync('public/sitemap.xml', '</urlset>\n', encoding = 'utf8');
-
+                fs.appendFileSync(dir, '</urlset>\n', encoding = 'utf8');
+                fs.close(fd, function (err) {
+                    if (err) {
+                        status.error("Got an error " + err);
+                    }
+                    status.success("Finished");
+                });
             });
         },
         error: function (object, error) {
