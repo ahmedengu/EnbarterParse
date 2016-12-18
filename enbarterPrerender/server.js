@@ -40,6 +40,8 @@ server.use(prerender.sendPrerenderHeader());
 server.use(prerender.whitelist());
 server.use(prerender.logger());
 server.use(prerender.httpHeaders());
+server.use(require('prerender-remove-meta-fragment'));
+
 // server.use(prerender.removeScriptTags());
 
 server.start();
