@@ -1,34 +1,37 @@
 #!/usr/bin/env bash
+# Ubuntu 16.04.1 x64
 
-sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get update -y
+sudo apt-get upgrade -y
 curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 sudo add-apt-repository ppa:ondrej/php
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
-sudo apt-get update
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+sudo apt-get update -y
 
 wget -O- https://raw.github.com/ajenti/ajenti/1.x/scripts/install-ubuntu.sh | sudo sh
 ufw allow 8000
 
 sudo apt-get autoremove && sudo apt-get remove apache2*
-sudo apt-get install ajenti-v ajenti-v-nginx ajenti-v-mail ajenti-v-ftp-pureftpd ajenti-v-nodejs ajenti-v-php7.0-fpm php7.0-mysql php7.0-mbstring php7.0-cli php7.0-curl php7.0-dom
-sudo apt-get install bind9
-sudo apt-get install fail2ban
+sudo apt-get install -y ajenti-v ajenti-v-nginx ajenti-v-mail ajenti-v-ftp-pureftpd ajenti-v-nodejs ajenti-v-php7.0-fpm php7.0-mysql php7.0-mbstring php7.0-cli php7.0-curl php7.0-dom apache2-utils
+sudo apt-get install -y bind9
+sudo apt-get install -y fail2ban
 
 sudo apt-get install -y mongodb-org python-pip build-essential python-dev libssl-dev unzip
 sudo pip install pymongo
+sudo systemctl enable mongod
 
 sudo apt-get install -y mysql-server
 sudo mysql_secure_installation
-sudo mysql_install_db
+#sudo mysql_install_db
 
 
 sudo apt-get install -y nodejs
 
 
 
-sudo apt-get install -y git phantomjs redis-server
+
+sudo apt-get install -y git phantomjs
 #sudo apt-get install -y redis-server
 
 ssh-keygen -t rsa
