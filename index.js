@@ -11,7 +11,7 @@ app.use('/public', express.static(path.join(__dirname, '/public')));
 
 var api = new ParseServer({
     appName: 'Enbarter',
-    publicServerURL: 'http://api.enbarterdev.ml/v1',
+    publicServerURL: 'https://api.enbarterdev.ml/v1',
     databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@localhost:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
@@ -19,7 +19,7 @@ var api = new ParseServer({
     masterKey: 'fb4b98ea158cbbdd32c366682f280533d89374a2fa8908186b4478ff295b96f77096f54eabc9a61b956237d817fb04ea6498c73c4cd9ec14e1ade7cc81136b0',
     restAPIKey: "1df92f3ebeb37b888c55ea9edd4fedf63a718ddf63a718d73a0556fb473a0556fb49d5cdde63c567dc31df92f3ebeb37b888c55ea9edd4fe9d5cdde63c567dc3",
     clientKey: "315b2d9b1fe6ee6808696a315b2d9b1fe6ee6808696ac17b77fbd610b49ed4b513434fd255e5a400c9b82ec17b77fbd610b49ed4b513434fd255e5a400c9b82e",
-    serverURL: 'http://api.enbarterdev.ml/v1',
+    serverURL: 'https://api.enbarterdev.ml/v1',
     liveQuery: {
         classNames: ["BarterDashboard", "Chat", "Notification"]
     },
@@ -56,10 +56,11 @@ var api = new ParseServer({
     emailAdapter: {
         module: "simple-parse-smtp-adapter",
         options: {
-            fromAddress: 'Enbarter <ahmedengu@enbarterdev.ml>',
-            user: 'ahmedengu@enbarterdev.ml',
-            password: '123456789',
-            host: 'mail.enbarterdev.ml',
+            fromAddress: 'Enbarter <no-reply@enbarterdev.ml>',
+            user: 'no-reply@enbarterdev.ml',
+            password: 'cba2321ce58c9bd28e8b7b1d3e6fde24a194c485cd94b7c21e736041487bab80',
+            host: 'enbarterdev.ml',
+            isTlsRejectUnauthorized: false,
             isSSL: true, //True or false if you are using ssl
             port: 465, //SSL port or another port
             name: 'enbarterdev.ml', //  optional, used for identifying to the server
