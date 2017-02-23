@@ -46,15 +46,15 @@ Parse.Cloud.beforeSave("BarterDashboard", function (request, response) {
             return response.error("Not Authorized");
         }
         if (request.object.dirty('barterUpUser') && request.object.dirty('barterUpMilestones')) {
-            createNotification(request.object.get('barterUpUser'), "barterUpUser", request.user, request.object.id);
+            createNotification(request.object.get('barterUpUser'), "barterUpUser", request.user, request.object.get('barter').id);
         } else if (request.object.dirty('barterUpMilestones') && request.original.get('barterUpMilestones')) {
-            createNotification(request.object.get("user"), "barterUpMilestones", request.user, request.object.id);
+            createNotification(request.object.get("user"), "barterUpMilestones", request.user, request.object.get('barter').id);
         } else if (request.object.dirty('offerMilestones') && request.original.get('barterUpMilestones')) {
-            createNotification(request.object.get("barterUpUser"), "offerMilestones", request.user, request.object.id);
+            createNotification(request.object.get("barterUpUser"), "offerMilestones", request.user, request.object.get('barter').id);
         } else if (request.object.dirty('offerFinalPic') && !request.original.get('offerFinalPic')) {
-            createNotification(request.object.get("barterUpUser"), "finalUploaded", request.user, request.object.id);
+            createNotification(request.object.get("barterUpUser"), "finalUploaded", request.user, request.object.get('barter').id);
         } else if (request.object.dirty('barterUpFinalPic') && !request.original.get('barterUpFinalPic')) {
-            createNotification(request.object.get("user"), "finalUploaded", request.user, request.object.id);
+            createNotification(request.object.get("user"), "finalUploaded", request.user, request.object.get('barter').id);
         }
     }
     return response.success();
