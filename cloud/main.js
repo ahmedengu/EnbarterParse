@@ -17,7 +17,7 @@ Parse.Cloud.afterSave("_User", function (request) {
 
 function checkRequired(request) {
     var dirtyKeys = request.object.dirtyKeys();
-    var required = ['barterTitle', 'barterDescription', 'offerCategory', 'offerDescription', 'offerMilestones', 'offerDeadline', 'seekCategory', 'seekDescription', 'seekDeadline', 'user', 'state', 'words'];
+    var required = ['barterTitle', 'offerCategory', 'offerDescription', 'offerMilestones', 'offerDeadline', 'seekCategory', 'seekDescription', 'seekDeadline', 'user', 'state', 'words'];
     var errors = "";
     for (var i = 0; i < required.length; i++) {
         if (dirtyKeys.indexOf(required[i]) == -1)
