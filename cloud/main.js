@@ -8,7 +8,31 @@ var sendSmtpMail = require('simple-parse-smtp-adapter')({
     name: 'enbarterdev.ml',
     emailField: 'email'
 }).sendMail;
+var sanitizeHtml = require('sanitize-html');
 
+function sanitizeIt(html) {
+    return sanitizeHtml(html, {
+        allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub',
+        ],
+        allowedAttributes: {
+            a: ['href', 'name', 'target'],
+            img: ['src']
+        },
+        selfClosing: ['img', 'br', 'hr', 'link'],
+        allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
+        allowedSchemesByTag: {
+            img: ['http', 'https', 'data']
+        },
+        allowProtocolRelative: true
+    });
+}
+
+Parse.Cloud.beforeSave("_User", function (request, response) {
+    if (request.object.dirty('bio')) {
+        request.object.set('bio', sanitizeIt(request.object.get('bio')));
+    }
+    return response.success();
+});
 Parse.Cloud.afterSave("_User", function (request) {
     if (!request.object.existed()) {
         createNotification(request.object, "newUserWelcoming", request.object, request.object.id);
@@ -147,6 +171,12 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
         } else if (request.object.dirty('barterUpFinalPic') && !request.original.get('barterUpFinalPic')) {
             createNotification(request.object.get("user"), "finalUploaded", request.user, request.object.id);
         }
+    }
+    if (request.object.dirty('offerDescription')) {
+        request.object.set('offerDescription', sanitizeIt(request.object.get('offerDescription')));
+    }
+    if (request.object.dirty('seekDescription')) {
+        request.object.set('seekDescription', sanitizeIt(request.object.get('seekDescription')));
     }
     return response.success();
 });
