@@ -10,10 +10,9 @@ var sendSmtpMail = require('simple-parse-smtp-adapter')({
 }).sendMail;
 var sanitizeHtml = require('sanitize-html');
 
-function sanitizeIt(html) {
-    return sanitizeHtml(html, {
-        allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub',
-        ],
+function sanitizeIt(html, removeTag) {
+    let options = {
+        allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub'],
         allowedAttributes: {
             a: ['href', 'name', 'target'],
             img: ['src']
@@ -24,12 +23,16 @@ function sanitizeIt(html) {
             img: ['http', 'https', 'data']
         },
         allowProtocolRelative: true
-    });
+    };
+    for (let tag of removeTag || []) {
+        options.allowedTags = options.allowedTags.filter(i => i !== tag);
+    }
+    return sanitizeHtml(html, options);
 }
 
 Parse.Cloud.beforeSave("_User", function (request, response) {
     if (request.object.dirty('bio')) {
-        request.object.set('bio', sanitizeIt(request.object.get('bio')));
+        request.object.set('bio', sanitizeIt(request.object.get('bio'), ['img', 'hr', 'a']));
     }
     return response.success();
 });
