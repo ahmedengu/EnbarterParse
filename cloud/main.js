@@ -32,7 +32,7 @@ function sanitizeIt(html, removeTag) {
 
 Parse.Cloud.beforeSave("_User", function (request, response) {
     if (request.object.dirty('bio')) {
-        request.object.set('bio', sanitizeIt(request.object.get('bio'), ['img', 'hr', 'a']));
+        request.object.set('bio', sanitizeIt(request.object.get('bio'), ['img', 'hr', 'iframe']));
     }
     return response.success();
 });
