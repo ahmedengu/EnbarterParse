@@ -12,7 +12,7 @@ var sanitizeHtml = require('sanitize-html');
 
 function sanitizeIt(html, removeTag) {
     let options = {
-        allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub'],
+        allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub', 'span'],
         allowedAttributes: {
             a: ['href', 'name', 'target', 'src'],
             img: ['src']
@@ -22,7 +22,10 @@ function sanitizeIt(html, removeTag) {
         allowedSchemesByTag: {
             img: ['http', 'https', 'data']
         },
-        allowProtocolRelative: true
+        allowProtocolRelative: true, allowedClasses: {
+            a: ['aWrapper'],
+            span: ['glyphicon', 'glyphicon-play-circle', 'playBtn']
+        }
     };
     for (let tag of removeTag || []) {
         options.allowedTags = options.allowedTags.filter(i => i !== tag);
