@@ -12,7 +12,7 @@ app.use('/public', express.static(path.join(__dirname, '/public')));
 var api = new ParseServer({
     appName: 'Enbarter',
     publicServerURL: 'https://api.enbarterdev.ml/v1',
-    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@localhost:27017/enbarterDB',
+    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@82.196.12.219:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
     javascriptKey: 'Ad06@!30',
@@ -36,7 +36,8 @@ var api = new ParseServer({
         validatorPattern: /^(?=.{8,})/,
         maxPasswordAge: 1000,
         maxPasswordHistory: 5,
-        resetTokenValidityDuration: 24 * 60 * 60
+        resetTokenValidityDuration: 24 * 60 * 60,
+        doNotAllowUsername: true
     },
     auth: {
         facebook: {
