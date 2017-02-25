@@ -14,7 +14,7 @@ function sanitizeIt(html, removeTag) {
     let options = {
         allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub'],
         allowedAttributes: {
-            a: ['href', 'name', 'target'],
+            a: ['href', 'name', 'target', 'src'],
             img: ['src']
         },
         selfClosing: ['img', 'br', 'hr', 'link'],
