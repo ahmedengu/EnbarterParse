@@ -151,7 +151,10 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                             useMasterKey: true,
                             success: function (results) {
                                 if (results[0]) {
-                                    result.get('user').set('membership', results[0]);
+                                    result.get('user').set('membership', {
+                                        "__type": "Pointer", "className": "Membership",
+                                        "objectId": "G0wH0oBAyF"
+                                    });
                                     result.get('user').save(null, {useMasterKey: true});
                                 }
                             }
