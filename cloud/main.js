@@ -34,11 +34,21 @@ function sanitizeIt(html, removeTag) {
 }
 
 Parse.Cloud.beforeSave("_User", function (request, response) {
+    if (request.object.dirty('membership') && !request.master) {
+        request.object.set('membership', request.original.get('membership'));
+    }
     if (request.object.dirty('bio')) {
         request.object.set('bio', sanitizeIt(request.object.get('bio'), ['img', 'hr', 'iframe']));
     }
+    if (request.object.isNew()) {
+        request.object.set('membership', {
+            "__type": "Pointer", "className": "Membership",
+            "objectId": "G0wH0oBAyF"
+        });
+    }
     return response.success();
 });
+
 Parse.Cloud.afterSave("_User", function (request) {
     if (!request.object.existed()) {
         createNotification(request.object, "newUserWelcoming", request.object, request.object.id);

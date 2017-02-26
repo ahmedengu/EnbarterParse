@@ -8,8 +8,10 @@ const resolve = require('path').resolve;
 
 var app = express();
 app.use('/public', express.static(path.join(__dirname, '/public')));
-var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(require('body-parser').urlencoded({extended: false}));
+const Serialize = require('php-serialize');
+
+const crypto = require('crypto');
 
 var api = new ParseServer({
     appName: 'Enbarter',
@@ -98,14 +100,39 @@ app.get('/', function (req, res) {
 
 app.post('/paddleWebhook', function (req, res) {
     let params = req.body;
-    console.log(params);
-    var PaddleLog = Parse.Object.extend("PaddleLog");
-    var paddleLog = new PaddleLog();
+    let signature = params.p_signature;
+    delete params.p_signature;
+    let serialize = Serialize.serialize(Object.keys(params).sort().reduce((r, k) => (r[k] = params[k], r), {}));
+    const verify = crypto.createVerify('RSA-SHA1');
+    verify.write(serialize);
+    verify.end();
+
+    if (!verify.verify(`-----BEGIN PUBLIC KEY-----
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAl5ZAnSrqqK8dnicmodUD
+Eg0x/BYCrdhLUTV2MnEukvIpaOcVwTFzOb9+uGp3szjHkGYMK9TyGP9FI9HuVZfQ
+j4KuU7S1owhVmjeXIR5IcYyBQGl41ccwv3UefojV0TvwO5e0E6UOM+PZy25XzZXx
+dal8WPvHWoahsB+8FscpcOh/TPBUhFVA1vSIcRQQGsCxDEiofjxQskTBWAkwuZyF
+4sdVWo9u4EC61AgSlnjx/2Gu/QezjF/tXcs7Wa/0ru0m73iitHGdLenK0upyDHIi
+qMkOe0THxcQtAa0UxIGL/5IeJrGw4die2U13VIpHkJOYQ0xU3qpaVbdS7y2e8VQ0
+O1NsF99Z/1PJxlB1r9kNRbNShT3BVDpIlG6//4ztGG1OVTmQQBupUoVrGhJxUTqh
+aLPAHVk3LK6ruQXIxyqCwq53y9Y9Gpwf+5S0R8PFSgwFP5JCA/QuLoetM7dHSFiF
+fgh9IwrVG7rEZP2ULCE7t61JOuWmLj/splqK+KYE9YJJ8QgBgkKyR61ZxSeeIC7G
+0IlS8BVgzNCLGPxxNFMYCq+P23z0YSFsVOCMmYvr1dwKzDF7OzYeaRo9BPUUi+6S
+JyS6cr5RElfniVOHQjj1XqSwF4g60DzeAzkNlUqW7lC6DKt+2cVX1Qv1lRhudiBX
+tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
+-----END PUBLIC KEY-----`, signature, 'base64')) {
+        res.status(500).send({
+            "error": "invalid signature"
+        });
+        return;
+    }
+
+    let PaddleLog = Parse.Object.extend("PaddleLog");
+    let paddleLog = new PaddleLog();
 
     for (let key in params) {
         paddleLog.set(key, params[key]);
     }
-    paddleLog.unset('p_signature');
 
     let query = new Parse.Query(Parse.User);
 
@@ -114,6 +141,26 @@ app.post('/paddleWebhook', function (req, res) {
             useMasterKey: true,
             success: function (result) {
                 res.send({result: 200});
+
+                if (result.get('user')) {
+                    if (['subscription_created', 'payment_succeeded', 'subscription_payment_succeeded'].indexOf(result.get('alert_name')) != -1) {
+                        let Membership = Parse.Object.extend("Membership");
+                        var queryMembership = new Parse.Query(Membership);
+                        queryMembership.equalTo('productId', result.get('product_id') || result.get('subscription_plan_id'));
+                        queryMembership.find({
+                            useMasterKey: true,
+                            success: function (results) {
+                                if (results[0]) {
+                                    result.get('user').set('membership', results[0]);
+                                    result.get('user').save(null, {useMasterKey: true});
+                                }
+                            }
+                        });
+                    } else if (['payment_refunded', 'subscription_cancelled', 'subscription_payment_failed', 'subscription_payment_refunded'].indexOf(result.get('alert_name')) != -1) {
+                        result.get('user').unset('membership');
+                        result.get('user').save(null, {useMasterKey: true});
+                    }
+                }
             },
             error: function (object, error) {
                 console.error("Got an error " + error.code + " : " + error.message);
@@ -121,6 +168,10 @@ app.post('/paddleWebhook', function (req, res) {
             }
         })
     };
+    if (!params.passthrough) {
+        ret();
+        return;
+    }
     query.get(params.passthrough, {
             useMasterKey: true,
             success: function (result) {
@@ -133,6 +184,7 @@ app.post('/paddleWebhook', function (req, res) {
             }
         }
     );
+
 });
 
 
