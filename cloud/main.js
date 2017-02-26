@@ -305,7 +305,7 @@ Parse.Cloud.job("sitemapGenerator", function (request, status) {
                 fs.appendFileSync(dir, '<?xml version="1.0" encoding="UTF-8"?>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '   <url>\n', encoding = 'utf8');
-                fs.appendFileSync(dir, '       <loc>http://enbarter.com</loc>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <loc>https://enbarter.com</loc>\n', encoding = 'utf8');
                 let updatedAt = (results.length) ? results[0].updatedAt : new Date();
                 fs.appendFileSync(dir, '       <lastmod>' + updatedAt + '</lastmod>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '       <changefreq>daily</changefreq>\n', encoding = 'utf8');
@@ -313,7 +313,7 @@ Parse.Cloud.job("sitemapGenerator", function (request, status) {
                 fs.appendFileSync(dir, '   </url>\n', encoding = 'utf8');
 
                 fs.appendFileSync(dir, '   <url>\n', encoding = 'utf8');
-                fs.appendFileSync(dir, '       <loc>http://enbarter.com/browse</loc>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <loc>https://enbarter.com/browse</loc>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '       <lastmod>' + ((results.length) ? results[0].updatedAt : new Date()) + '</lastmod>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '       <changefreq>daily</changefreq>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '       <priority>1.0</priority>\n', encoding = 'utf8');
@@ -321,7 +321,7 @@ Parse.Cloud.job("sitemapGenerator", function (request, status) {
 
                 for (let r of results) {
                     fs.appendFileSync(dir, '   <url>\n', encoding = 'utf8');
-                    fs.appendFileSync(dir, '       <loc>http://enbarter.com/barter/' + r.id + '</loc>\n', encoding = 'utf8');
+                    fs.appendFileSync(dir, '       <loc>https://enbarter.com/barter/' + r.id + '</loc>\n', encoding = 'utf8');
                     fs.appendFileSync(dir, '       <lastmod>' + r.updatedAt + '</lastmod>\n', encoding = 'utf8');
                     fs.appendFileSync(dir, '       <changefreq>weakly</changefreq>\n', encoding = 'utf8');
                     fs.appendFileSync(dir, '       <priority>0.8</priority>\n', encoding = 'utf8');
