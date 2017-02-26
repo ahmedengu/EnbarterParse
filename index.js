@@ -8,11 +8,13 @@ const resolve = require('path').resolve;
 
 var app = express();
 app.use('/public', express.static(path.join(__dirname, '/public')));
+var bodyParser = require('body-parser');
+app.use(bodyParser.urlencoded({extended: false}));
 
 var api = new ParseServer({
     appName: 'Enbarter',
     publicServerURL: 'https://api.enbarterdev.ml/v1',
-    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@82.196.12.219:27017/enbarterDB',
+    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@localhost:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
     javascriptKey: 'Ad06@!30',
@@ -93,6 +95,46 @@ app.get('/', function (req, res) {
     );
     res.end();
 });
+
+app.post('/paddleWebhook', function (req, res) {
+    let params = req.body;
+    console.log(params);
+    var PaddleLog = Parse.Object.extend("PaddleLog");
+    var paddleLog = new PaddleLog();
+
+    for (let key in params) {
+        paddleLog.set(key, params[key]);
+    }
+    paddleLog.unset('p_signature');
+
+    let query = new Parse.Query(Parse.User);
+
+    function ret() {
+        paddleLog.save(null, {
+            useMasterKey: true,
+            success: function (result) {
+                res.send({result: 200});
+            },
+            error: function (object, error) {
+                console.error("Got an error " + error.code + " : " + error.message);
+                res.status(500).send(error);
+            }
+        })
+    };
+    query.get(params.passthrough, {
+            useMasterKey: true,
+            success: function (result) {
+                paddleLog.set('user', result);
+                ret();
+            },
+            error: function (object, error) {
+                console.error("Got an error " + error.code + " : " + error.message);
+                ret();
+            }
+        }
+    );
+});
+
 
 var port = 1337;
 var httpServer = require('http').createServer(app);
