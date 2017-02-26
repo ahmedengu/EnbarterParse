@@ -16,7 +16,7 @@ const crypto = require('crypto');
 var api = new ParseServer({
     appName: 'Enbarter',
     publicServerURL: 'https://api.enbarterdev.ml/v1',
-    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@localhost:27017/enbarterDB',
+    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@82.196.12.219:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
     javascriptKey: 'Ad06@!30',
@@ -151,17 +151,39 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                             useMasterKey: true,
                             success: function (results) {
                                 if (results[0]) {
-                                    result.get('user').set('membership', {
-                                        "__type": "Pointer", "className": "Membership",
-                                        "objectId": "G0wH0oBAyF"
+                                    result.get('user').set('membership', results[0]);
+                                    result.get('user').save(null, {
+                                        useMasterKey: true,
+                                        success: function (result) {
+                                            console.log({
+                                                action: "set membership to " + results[0].id,
+                                                user: result.id
+                                            });
+                                        },
+                                        error: function (object, error) {
+                                            console.error("Got an error " + error.code + " : " + error.message);
+                                        }
                                     });
-                                    result.get('user').save(null, {useMasterKey: true});
                                 }
                             }
                         });
                     } else if (['payment_refunded', 'subscription_cancelled', 'subscription_payment_failed', 'subscription_payment_refunded'].indexOf(result.get('alert_name')) != -1) {
-                        result.get('user').unset('membership');
-                        result.get('user').save(null, {useMasterKey: true});
+                        result.get('user').set('membership', {
+                            "__type": "Pointer", "className": "Membership",
+                            "objectId": "G0wH0oBAyF"
+                        });
+                        result.get('user').save(null, {
+                            useMasterKey: true,
+                            success: function (result) {
+                                console.log({
+                                    action: "set membership to G0wH0oBAyF",
+                                    user: result.id
+                                });
+                            },
+                            error: function (object, error) {
+                                console.error("Got an error " + error.code + " : " + error.message);
+                            }
+                        });
                     }
                 }
             },
