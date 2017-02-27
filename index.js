@@ -199,10 +199,10 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
 
                         result.get('user').save(null, {
                             useMasterKey: true,
-                            success: function (result) {
+                            success: function (user) {
                                 console.log({
                                     action: "set membership to G0wH0oBAyF",
-                                    user: result.id
+                                    user: user.id
                                 });
                                 sendSmtpMail({
                                     to: user.get('email'),
