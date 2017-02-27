@@ -10,17 +10,28 @@ app.use(require('body-parser').urlencoded({extended: true}));
 const Serialize = require('php-serialize');
 
 const crypto = require('crypto');
-var sendSmtpMail = require('simple-parse-smtp-adapter')({
+let smtpOptions = {
     fromAddress: 'Enbarter <no-reply@enbarterdev.ml>',
     user: 'no-reply@enbarterdev.ml',
     password: 'cba2321ce58c9bd28e8b7b1d3e6fde24a194c485cd94b7c21e736041487bab80',
     host: 'enbarterdev.ml',
-    isSSL: false,
-    port: 25,
     isTlsRejectUnauthorized: false,
-    name: 'enbarterdev.ml',
-    emailField: 'email'
-}).sendMail;
+    isSSL: true, //True or false if you are using ssl
+    port: 465, //SSL port or another port
+    name: 'enbarterdev.ml', //  optional, used for identifying to the server
+    emailField: 'email',
+    templates: {
+        resetPassword: {
+            template: __dirname + '/views/email/reset-password',
+            subject: 'Reset your password'
+        },
+        verifyEmail: {
+            template: __dirname + '/views/email/verify-email',
+            subject: 'Verify Email'
+        }
+    }
+};
+var sendSmtpMail = require('simple-parse-smtp-adapter')(smtpOptions).sendMail;
 var api = new ParseServer({
     appName: 'Enbarter',
     publicServerURL: 'https://api.enbarterdev.ml/v1',
@@ -68,30 +79,7 @@ var api = new ParseServer({
     },
     emailAdapter: {
         module: "simple-parse-smtp-adapter",
-        options: {
-            fromAddress: 'Enbarter <no-reply@enbarterdev.ml>',
-            user: 'no-reply@enbarterdev.ml',
-            password: 'cba2321ce58c9bd28e8b7b1d3e6fde24a194c485cd94b7c21e736041487bab80',
-            host: 'enbarterdev.ml',
-            isTlsRejectUnauthorized: false,
-            isSSL: true, //True or false if you are using ssl
-            port: 465, //SSL port or another port
-            name: 'enbarterdev.ml', //  optional, used for identifying to the server
-            //Somtimes the user email is not in the 'email' field, the email is search first in
-            //email field, then in username field, if you have the user email in another field
-            //You can specify here
-            emailField: 'email',
-            templates: {
-                resetPassword: {
-                    template: __dirname + '/views/email/reset-password',
-                    subject: 'Reset your password'
-                },
-                verifyEmail: {
-                    template: __dirname + '/views/email/verify-email',
-                    subject: 'Verify Email'
-                }
-            }
-        }
+        options: smtpOptions
     }
 });
 
