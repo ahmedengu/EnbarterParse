@@ -36,11 +36,22 @@ function sanitizeIt(html, removeTag) {
 }
 
 Parse.Cloud.beforeSave("_User", function (request, response) {
-    if (request.object.dirty('membership') && request.original.get('membership') && !request.master) {
-        request.object.set('membership', request.original.get('membership'));
-    }
-    if (request.object.dirty('paymentInfo') && request.object.get('paymentInfo') && !request.master) {
-        request.object.set('paymentInfo', request.original.get('paymentInfo') || null);
+    if (!request.master) {
+        if (request.object.dirty('membership')) {
+            membership = {
+                "__type": "Pointer", "className": "Membership",
+                "objectId": "G0wH0oBAyF"
+            };
+            if (request.original)
+                membership = request.original.get('membership');
+            request.object.set('membership', membership);
+        }
+        if (request.object.dirty('paymentInfo')) {
+            paymentInfo = null;
+            if (request.original)
+                paymentInfo = request.original.get('paymentInfo');
+            request.object.set('paymentInfo', paymentInfo);
+        }
     }
     if (request.object.dirty('bio')) {
         request.object.set('bio', sanitizeIt(request.object.get('bio'), ['a', 'img', 'hr', 'iframe']));
@@ -86,7 +97,7 @@ Parse.Cloud.beforeSave("BarterDashboard", function (request, response) {
         var flag = false;
         var allowed = ['barterUpMilestones', 'barterUpFinalPic', 'barterUpDeadline'];
         for (var i = 0; i < dirtyKeys.length; i++) {
-            if (allowed.indexOf(dirtyKeys[i]) == -1)
+            if (dirtyKeys[i] != 'barter' && allowed.indexOf(dirtyKeys[i]) == -1)
                 flag = true;
         }
         if (request.original.get('barterUpUser') && request.user.id == request.original.get('barterUpUser').id && flag) {
@@ -230,6 +241,9 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                     console.error("Got an error " + error.code + " : " + error.message);
                 }
             });
+            if (request.original.get('barterUpRate')) {
+                request.object.set('state', 'completed');
+            }
             if (request.object.dirty('state') && request.object.get('state') == 'completed') {
                 createNotification(request.object.get('barterUpUser'), "barterCompleted", request.user, request.object.id);
                 createNotification(request.object.get('user'), "barterCompleted", request.object.get('barterUpUser'), request.object.id);
@@ -254,7 +268,9 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                     console.error("Got an error " + error.code + " : " + error.message);
                 }
             });
-
+            if (request.original.get('offerRate')) {
+                request.object.set('state', 'completed');
+            }
             if (request.object.dirty('state') && request.object.get('state') == 'completed') {
                 createNotification(request.object.get('barterUpUser'), "barterCompleted", request.user, request.object.id);
                 createNotification(request.object.get('user'), "barterCompleted", request.object.get('barterUpUser'), request.object.id);
@@ -306,7 +322,6 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
 });
 
 function createNotification(user, event, creator, objectId) {
-    var Notification = Parse.Object.extend("Notification");
     var notification = new Notification();
     notification.set("user", user);
     notification.set("creator", creator);

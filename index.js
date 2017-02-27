@@ -35,7 +35,7 @@ var sendSmtpMail = require('simple-parse-smtp-adapter')(smtpOptions).sendMail;
 var api = new ParseServer({
     appName: 'Enbarter',
     publicServerURL: 'https://api.enbarterdev.ml/v1',
-    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@82.196.12.219:27017/enbarterDB',
+    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@localhost:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
     javascriptKey: 'Ad06@!30',
@@ -156,6 +156,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                         paymentInfo.set('cancel_url', result.get('cancel_url'));
                                     if (result.get('update_url'))
                                         paymentInfo.set('update_url', result.get('update_url'));
+                                    paymentInfo.set('user', result.get('user'));
                                     result.get('user').set('paymentInfo', paymentInfo);
                                     result.set('paymentInfo', paymentInfo)
                                     result.get('user').save(null, {
@@ -206,7 +207,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                 });
                                 sendSmtpMail({
                                     to: user.get('email'),
-                                    text: 'hi,<br>Your subscription cancelled succeeded.<br>Event: ' + result.get('alert_name'),
+                                    text: 'hi,<br>Your subscription cancel succeeded.<br>Event: ' + result.get('alert_name'),
                                     subject: 'Premium Subscription Cancelled'
                                 });
                             },
