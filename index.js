@@ -10,7 +10,17 @@ app.use(require('body-parser').urlencoded({extended: true}));
 const Serialize = require('php-serialize');
 
 const crypto = require('crypto');
-
+var sendSmtpMail = require('simple-parse-smtp-adapter')({
+    fromAddress: 'Enbarter <no-reply@enbarterdev.ml>',
+    user: 'no-reply@enbarterdev.ml',
+    password: 'cba2321ce58c9bd28e8b7b1d3e6fde24a194c485cd94b7c21e736041487bab80',
+    host: 'enbarterdev.ml',
+    isSSL: false,
+    port: 25,
+    isTlsRejectUnauthorized: false,
+    name: 'enbarterdev.ml',
+    emailField: 'email'
+}).sendMail;
 var api = new ParseServer({
     appName: 'Enbarter',
     publicServerURL: 'https://api.enbarterdev.ml/v1',
@@ -133,7 +143,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
     }
 
     let query = new Parse.Query(Parse.User);
-
+    query.include('paymentInfo');
     function ret() {
         paddleLog.save(null, {
             useMasterKey: true,
@@ -150,13 +160,37 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                             success: function (results) {
                                 if (results[0]) {
                                     result.get('user').set('membership', results[0]);
+                                    var PaymentInfo = Parse.Object.extend("PaymentInfo");
+                                    let paymentInfo = result.get('user').get("paymentInfo") || new PaymentInfo();
+                                    if (result.get('receipt_url'))
+                                        paymentInfo.set('receipt_url', result.get('receipt_url'));
+                                    if (result.get('cancel_url'))
+                                        paymentInfo.set('cancel_url', result.get('cancel_url'));
+                                    if (result.get('update_url'))
+                                        paymentInfo.set('update_url', result.get('update_url'));
+                                    result.get('user').set('paymentInfo', paymentInfo);
                                     result.get('user').save(null, {
                                         useMasterKey: true,
-                                        success: function (result) {
+                                        success: function (user) {
                                             console.log({
                                                 action: "set membership to " + results[0].id,
-                                                user: result.id
+                                                user: user.id
                                             });
+                                            let text = 'hi,<br>Thank you for your payment,';
+
+                                            if (result.get('receipt_url'))
+                                                text += '<br>Receipt link: ' + result.get('receipt_url');
+                                            if (result.get('cancel_url'))
+                                                text += ' <br>Cancellation link: ' + result.get('cancel_url');
+                                            if (result.get('update_url'))
+                                                text += ' <br> Update link: ' + result.get('update_url');
+                                            text += '<br>Event: ' + result.get('alert_name');
+                                            sendSmtpMail({
+                                                to: user.get('email'),
+                                                text: text,
+                                                subject: 'Premium Subscription'
+                                            });
+
                                         },
                                         error: function (object, error) {
                                             console.error("Got an error " + error.code + " : " + error.message);
@@ -165,17 +199,24 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                 }
                             }
                         });
-                    } else if (['payment_refunded', 'subscription_cancelled', 'subscription_payment_failed', 'subscription_payment_refunded'].indexOf(result.get('alert_name')) != -1) {
+                    } else if (['payment_refunded', 'subscription_cancelled', 'subscription_payment_refunded'].indexOf(result.get('alert_name')) != -1) {
                         result.get('user').set('membership', {
                             "__type": "Pointer", "className": "Membership",
                             "objectId": "G0wH0oBAyF"
                         });
+                        result.get('user').unset('paymentInfo');
+
                         result.get('user').save(null, {
                             useMasterKey: true,
                             success: function (result) {
                                 console.log({
                                     action: "set membership to G0wH0oBAyF",
                                     user: result.id
+                                });
+                                sendSmtpMail({
+                                    to: user.get('email'),
+                                    text: 'hi,<br>Your subscription cancelled succeeded.<br>Event: ' + result.get('alert_name'),
+                                    subject: 'Premium Subscription Cancelled'
                                 });
                             },
                             error: function (object, error) {

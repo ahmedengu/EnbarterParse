@@ -1,10 +1,11 @@
 var sendSmtpMail = require('simple-parse-smtp-adapter')({
-    fromAddress: 'Enbarter <ahmedengu@enbarterdev.ml>',
-    user: 'ahmedengu@enbarterdev.ml',
-    password: '123456789',
-    host: 'mail.enbarterdev.ml',
+    fromAddress: 'Enbarter <no-reply@enbarterdev.ml>',
+    user: 'no-reply@enbarterdev.ml',
+    password: 'cba2321ce58c9bd28e8b7b1d3e6fde24a194c485cd94b7c21e736041487bab80',
+    host: 'enbarterdev.ml',
     isSSL: true,
     port: 465,
+    isTlsRejectUnauthorized: false,
     name: 'enbarterdev.ml',
     emailField: 'email'
 }).sendMail;
@@ -35,8 +36,11 @@ function sanitizeIt(html, removeTag) {
 }
 
 Parse.Cloud.beforeSave("_User", function (request, response) {
-    if (request.object.dirty('membership') && request.object.get('membership') && !request.master) {
+    if (request.object.dirty('membership') && request.original.get('membership') && !request.master) {
         request.object.set('membership', request.original.get('membership'));
+    }
+    if (request.object.dirty('paymentInfo') && request.object.get('paymentInfo') && !request.master) {
+        request.object.set('paymentInfo', request.original.get('paymentInfo') || null);
     }
     if (request.object.dirty('bio')) {
         request.object.set('bio', sanitizeIt(request.object.get('bio'), ['a', 'img', 'hr', 'iframe']));
