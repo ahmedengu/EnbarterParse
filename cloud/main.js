@@ -34,7 +34,7 @@ function sanitizeIt(html, removeTag) {
 }
 
 Parse.Cloud.beforeSave("_User", function (request, response) {
-    if (request.object.dirty('membership') && !request.master) {
+    if (request.object.dirty('membership') && request.object.get('membership') && !request.master) {
         request.object.set('membership', request.original.get('membership'));
     }
     if (request.object.dirty('bio')) {
@@ -99,12 +99,70 @@ Parse.Cloud.beforeSave("BarterDashboard", function (request, response) {
     }
     return response.success();
 });
+function checkLimits(request, response, callback) {
+    let query = new Parse.Query(Parse.User);
+    query.include('membership');
+    query.get(request.user.id, {
+            useMasterKey: true,
+            success: function (result) {
+                if (!result.get('membership')) {
+                    result.set('membership', {
+                        "__type": "Pointer", "className": "Membership",
+                        "objectId": "G0wH0oBAyF"
+                    });
+                    result.save(null, {
+                        useMasterKey: true
+                    });
+                }
+                let queryBarter = new Parse.Query("Barter");
+                queryBarter.greaterThanOrEqualTo('createdAt', new Date(new Date().setDate(new Date().getDate() - 30)));
+                queryBarter.find({
+                    success: function (results) {
+                        if (results.length >= result.get('membership').get('monthlyUnits'))
+                            return response.error('Sorry you have exceeded your monthly limit');
+
+                        let queryBarter = new Parse.Query("Barter");
+                        queryBarter.containedIn('state', ['new', 'bartered']);
+                        queryBarter.find({
+                            success: function (results) {
+                                if (results.length >= result.get('membership').get('activeLimit'))
+                                    return response.error('Sorry you have exceeded your active limit');
+                                callback();
+                            },
+                            error: function (object, error) {
+                                console.error("Got an error " + error.code + " : " + error.message);
+                                return response.error(error);
+                            }
+                        });
+                    },
+                    error: function (object, error) {
+                        console.error("Got an error " + error.code + " : " + error.message);
+                        return response.error(error);
+                    }
+                });
+            },
+            error: function (object, error) {
+                console.error("Got an error " + error.code + " : " + error.message);
+                return response.error(error);
+            }
+        }
+    );
+}
 Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
-        var errors = checkRequired(request);
-        if (errors.length) {
-            return response.error(errors);
-        }
+        checkLimits(request, response, function () {
+            var errors = checkRequired(request);
+            if (errors.length) {
+                return response.error(errors);
+            }
+            if (request.object.dirty('offerDescription')) {
+                request.object.set('offerDescription', sanitizeIt(request.object.get('offerDescription')));
+            }
+            if (request.object.dirty('seekDescription')) {
+                request.object.set('seekDescription', sanitizeIt(request.object.get('seekDescription')));
+            }
+            return response.success();
+        });
     } else {
         if (!request.user || ((request.user.id != request.object.get('user').id && (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 0 || (request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests'))))) {
             return response.error("Not Authorized");
@@ -187,14 +245,14 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
         } else if (request.object.dirty('barterUpFinalPic') && !request.original.get('barterUpFinalPic')) {
             createNotification(request.object.get("user"), "finalUploaded", request.user, request.object.id);
         }
+        if (request.object.dirty('offerDescription')) {
+            request.object.set('offerDescription', sanitizeIt(request.object.get('offerDescription')));
+        }
+        if (request.object.dirty('seekDescription')) {
+            request.object.set('seekDescription', sanitizeIt(request.object.get('seekDescription')));
+        }
+        return response.success();
     }
-    if (request.object.dirty('offerDescription')) {
-        request.object.set('offerDescription', sanitizeIt(request.object.get('offerDescription')));
-    }
-    if (request.object.dirty('seekDescription')) {
-        request.object.set('seekDescription', sanitizeIt(request.object.get('seekDescription')));
-    }
-    return response.success();
 });
 
 function createNotification(user, event, creator, objectId) {
@@ -308,6 +366,13 @@ Parse.Cloud.job("sitemapGenerator", function (request, status) {
                 fs.appendFileSync(dir, '       <loc>https://enbarter.com</loc>\n', encoding = 'utf8');
                 let updatedAt = (results.length) ? results[0].updatedAt : new Date();
                 fs.appendFileSync(dir, '       <lastmod>' + updatedAt + '</lastmod>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <changefreq>daily</changefreq>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <priority>1.0</priority>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '   </url>\n', encoding = 'utf8');
+
+                fs.appendFileSync(dir, '   <url>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <loc>https://enbarter.com/prices</loc>\n', encoding = 'utf8');
+                fs.appendFileSync(dir, '       <lastmod>' + ((results.length) ? results[0].updatedAt : new Date()) + '</lastmod>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '       <changefreq>daily</changefreq>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '       <priority>1.0</priority>\n', encoding = 'utf8');
                 fs.appendFileSync(dir, '   </url>\n', encoding = 'utf8');
