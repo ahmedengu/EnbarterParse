@@ -114,20 +114,42 @@ function checkLimits(request, response, callback) {
                         useMasterKey: true
                     });
                 }
-                let queryBarter = new Parse.Query("Barter");
-                queryBarter.greaterThanOrEqualTo('createdAt', new Date(new Date().setDate(new Date().getDate() - 30)));
-                queryBarter.find({
+                let queryBarter1 = new Parse.Query("Barter");
+                queryBarter1.equalTo('user', request.user);
+                queryBarter1.greaterThanOrEqualTo('createdAt', new Date(new Date().setDate(new Date().getDate() - 30)));
+                let queryBarter2 = new Parse.Query("Barter");
+                queryBarter2.equalTo('barterUpUser', request.user);
+                queryBarter2.greaterThanOrEqualTo('createdAt', new Date(new Date().setDate(new Date().getDate() - 30)));
+
+                let queryBarter3 = request.user.relation('barterRequests').query();
+                queryBarter3.containedIn('state', ['new', 'bartered']);
+                let mainQuery = Parse.Query.or(queryBarter1, queryBarter2, queryBarter3);
+                mainQuery.find({
                     success: function (results) {
                         if (results.length >= result.get('membership').get('monthlyUnits'))
                             return response.error('Sorry you have exceeded your monthly limit');
 
-                        let queryBarter = new Parse.Query("Barter");
-                        queryBarter.containedIn('state', ['new', 'bartered']);
-                        queryBarter.find({
+                        let queryBarter1 = new Parse.Query("Barter");
+                        queryBarter1.equalTo('user', request.user);
+                        queryBarter1.containedIn('state', ['new', 'bartered']);
+                        let queryBarter2 = new Parse.Query("Barter");
+                        queryBarter2.equalTo('barterUpUser', request.user);
+                        queryBarter2.containedIn('state', ['new', 'bartered']);
+                        let mainQuery = Parse.Query.or(queryBarter1, queryBarter2);
+
+                        mainQuery.find({
                             success: function (results) {
                                 if (results.length >= result.get('membership').get('activeLimit'))
                                     return response.error('Sorry you have exceeded your active limit');
-                                callback();
+                                callback(function () {
+                                    if (request.object.dirty('offerDescription')) {
+                                        request.object.set('offerDescription', sanitizeIt(request.object.get('offerDescription')));
+                                    }
+                                    if (request.object.dirty('seekDescription')) {
+                                        request.object.set('seekDescription', sanitizeIt(request.object.get('seekDescription')));
+                                    }
+                                    return response.success();
+                                });
                             },
                             error: function (object, error) {
                                 console.error("Got an error " + error.code + " : " + error.message);
@@ -150,18 +172,12 @@ function checkLimits(request, response, callback) {
 }
 Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
-        checkLimits(request, response, function () {
+        checkLimits(request, response, function (callback) {
             var errors = checkRequired(request);
             if (errors.length) {
                 return response.error(errors);
             }
-            if (request.object.dirty('offerDescription')) {
-                request.object.set('offerDescription', sanitizeIt(request.object.get('offerDescription')));
-            }
-            if (request.object.dirty('seekDescription')) {
-                request.object.set('seekDescription', sanitizeIt(request.object.get('seekDescription')));
-            }
-            return response.success();
+            callback();
         });
     } else {
         if (!request.user || ((request.user.id != request.object.get('user').id && (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 0 || (request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests'))))) {
@@ -233,9 +249,32 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                 createNotification(request.object.get('user'), "barterCompleted", request.object.get('barterUpUser'), request.object.id);
             }
         } else if (request.object.dirty('barterUpUser') && request.object.dirty('barterUpMilestones')) {
+
             createNotification(request.object.get('barterUpUser'), "barterUpUser", request.user, request.object.id);
+
+            var query = new Parse.Query(Parse.User);
+            query.get(request.object.get('barterUpUser').id, {
+                    useMasterKey: true,
+                    success: function (result) {
+                        let relation = result.relation('barterRequests');
+                        relation.remove(request.object);
+                        result.save(null, {
+                            useMasterKey: true, error: function (object, error) {
+                                console.error("Got an error " + error.code + " : " + error.message);
+                            }
+                        });
+                    },
+                    error: function (object, error) {
+                        console.error("Got an error " + error.code + " : " + error.message);
+                    }
+                }
+            );
         } else if (request.object.dirty('barterRequests')) {
-            createNotification(request.object.get("user"), "barterRequests", request.user, request.object.id);
+            checkLimits(request, response, function (callback) {
+                createNotification(request.object.get("user"), "barterRequests", request.user, request.object.id);
+                callback();
+            });
+            return;
         } else if (request.object.dirty('barterUpMilestones') && request.original.get('barterUpMilestones')) {
             createNotification(request.object.get("user"), "barterUpMilestones", request.user, request.object.id);
         } else if (request.object.dirty('offerMilestones') && request.original.get('barterUpMilestones')) {

@@ -1,5 +1,3 @@
-var raven = require('raven');
-var client = new raven.Client('https://22c41b4449c04f2f9678babd3400566c:db3b5311623146389b2afe0e37340d95@sentry.io/118691');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var express = require('express');
 var ParseServer = require('parse-server').ParseServer;
@@ -8,7 +6,7 @@ const resolve = require('path').resolve;
 
 var app = express();
 app.use('/public', express.static(path.join(__dirname, '/public')));
-app.use(require('body-parser').urlencoded({extended: false}));
+app.use(require('body-parser').urlencoded({extended: true}));
 const Serialize = require('php-serialize');
 
 const crypto = require('crypto');
