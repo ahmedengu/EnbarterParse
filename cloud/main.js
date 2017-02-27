@@ -87,17 +87,20 @@ function checkRequired(request) {
     return errors;
 }
 Parse.Cloud.beforeSave("BarterDashboard", function (request, response) {
-    if (request.object.isNew()) {
-    } else {
+    if (!request.master && !request.object.isNew()) {
         if (request.object.dirty('barterUpUser') && request.original.get('barterUpUser')) {
             return response.error("Not Authorized");
         }
 
         var dirtyKeys = request.object.dirtyKeys();
+        if (dirtyKeys.length == 1 && dirtyKeys[i] == 'barter') {
+            request.object.set('barter', request.original.get('barter'));
+            return response.success();
+        }
         var flag = false;
         var allowed = ['barterUpMilestones', 'barterUpFinalPic', 'barterUpDeadline'];
         for (var i = 0; i < dirtyKeys.length; i++) {
-            if (dirtyKeys[i] != 'barter' && allowed.indexOf(dirtyKeys[i]) == -1)
+            if (allowed.indexOf(dirtyKeys[i]) == -1)
                 flag = true;
         }
         if (request.original.get('barterUpUser') && request.user.id == request.original.get('barterUpUser').id && flag) {
@@ -245,6 +248,13 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                 request.object.set('state', 'completed');
             }
             if (request.object.dirty('state') && request.object.get('state') == 'completed') {
+                request.original.get('barterDashboard').set('state', 'completed');
+                request.original.get('barterDashboard').save(null, {
+                    useMasterKey: true,
+                    error: function (object, error) {
+                        console.error("Got an error " + error.code + " : " + error.message);
+                    }
+                });
                 createNotification(request.object.get('barterUpUser'), "barterCompleted", request.user, request.object.id);
                 createNotification(request.object.get('user'), "barterCompleted", request.object.get('barterUpUser'), request.object.id);
             }
@@ -272,6 +282,14 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
                 request.object.set('state', 'completed');
             }
             if (request.object.dirty('state') && request.object.get('state') == 'completed') {
+                request.original.get('barterDashboard').set('state', 'completed');
+                request.original.get('barterDashboard').save(null, {
+                    useMasterKey: true,
+                    error: function (object, error) {
+                        console.error("Got an error " + error.code + " : " + error.message);
+                    }
+                });
+
                 createNotification(request.object.get('barterUpUser'), "barterCompleted", request.user, request.object.id);
                 createNotification(request.object.get('user'), "barterCompleted", request.object.get('barterUpUser'), request.object.id);
             }
@@ -322,6 +340,7 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
 });
 
 function createNotification(user, event, creator, objectId) {
+    var Notification = Parse.Object.extend("Notification");
     var notification = new Notification();
     notification.set("user", user);
     notification.set("creator", creator);
