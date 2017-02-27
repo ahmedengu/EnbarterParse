@@ -123,6 +123,7 @@ function checkLimits(request, response, callback) {
 
                 let queryBarter3 = request.user.relation('barterRequests').query();
                 queryBarter3.equalTo('state', 'new');
+                queryBarter3.greaterThanOrEqualTo('createdAt', new Date(new Date().setDate(new Date().getDate() - 30)));
                 let mainQuery = Parse.Query.or(queryBarter1, queryBarter2, queryBarter3);
                 mainQuery.find({
                     success: function (results) {
