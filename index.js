@@ -157,6 +157,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                     if (result.get('update_url'))
                                         paymentInfo.set('update_url', result.get('update_url'));
                                     result.get('user').set('paymentInfo', paymentInfo);
+                                    result.set('paymentInfo', paymentInfo)
                                     result.get('user').save(null, {
                                         useMasterKey: true,
                                         success: function (user) {
@@ -178,7 +179,9 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                                 text: text,
                                                 subject: 'Premium Subscription'
                                             });
-
+                                            result.save(null, {
+                                                useMasterKey: true
+                                            });
                                         },
                                         error: function (object, error) {
                                             console.error("Got an error " + error.code + " : " + error.message);
