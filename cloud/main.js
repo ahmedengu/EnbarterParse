@@ -9,6 +9,7 @@ var sendSmtpMail = require('simple-parse-smtp-adapter')({
     emailField: 'email'
 }).sendMail;
 var sanitizeHtml = require('sanitize-html');
+const fs = require('fs');
 
 function sanitizeIt(html, removeTag) {
     let options = {
@@ -38,13 +39,18 @@ Parse.Cloud.beforeSave("_User", function (request, response) {
         request.object.set('membership', request.original.get('membership'));
     }
     if (request.object.dirty('bio')) {
-        request.object.set('bio', sanitizeIt(request.object.get('bio'), ['img', 'hr', 'iframe']));
+        request.object.set('bio', sanitizeIt(request.object.get('bio'), ['a', 'img', 'hr', 'iframe']));
     }
     if (request.object.isNew()) {
         request.object.set('membership', {
             "__type": "Pointer", "className": "Membership",
             "objectId": "G0wH0oBAyF"
         });
+    } else {
+        if (request.object.dirty('pic') && request.original.get('pic') && request.object.get('pic')) {
+            fs.unlink(__dirname + '/../files/' + request.original.get('pic').name(), function () {
+            });
+        }
     }
     return response.success();
 });
