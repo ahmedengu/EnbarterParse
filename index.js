@@ -156,6 +156,8 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                         paymentInfo.set('cancel_url', result.get('cancel_url'));
                                     if (result.get('update_url'))
                                         paymentInfo.set('update_url', result.get('update_url'));
+                                    if (result.get('subscription_id'))
+                                        paymentInfo.set('subscription_id', result.get('subscription_id'));
                                     paymentInfo.set('user', result.get('user'));
                                     result.get('user').set('paymentInfo', paymentInfo);
                                     result.set('paymentInfo', paymentInfo)
