@@ -352,6 +352,7 @@ function createNotification(user, event, creator, objectId) {
     notification.set("user", user);
     notification.set("creator", creator);
     notification.set("event", event);
+    var subject, message;
     switch (event) {
         case 'rate':
             notification.set("description", "You got a new rate");
@@ -359,23 +360,18 @@ function createNotification(user, event, creator, objectId) {
 
             subject = 'You got a new rate';
             message = 'Hi, <br> You got a new rate <br> http://enbarter.com' + notification.get('redirect');
-            sendMailToUser(notification.get('user'), message, subject);
-
             break;
         case 'barterRequests':
             notification.set('description', 'You got a new barter request');
             notification.set("redirect", '/barter/' + objectId);
             subject = 'You got a new barter request';
             message = 'Hi, <br> You got a new barter request <br> http://enbarter.com' + notification.get('redirect');
-            sendMailToUser(notification.get('user'), message, subject);
             break;
         case 'barterUpUser':
             notification.set('description', 'Your barter request accepted go to dashboard');
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Your barter request accepted go to dashboard';
             message = 'Hi, <br> Your barter request accepted go to dashboard <br> http://enbarter.com' + notification.get('redirect');
-            sendMailToUser(notification.get('user'), message, subject);
-
             break;
         case 'barterUpMilestones':
         case 'offerMilestones':
@@ -383,7 +379,6 @@ function createNotification(user, event, creator, objectId) {
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Your barter have checked';
             message = 'Hi, <br> Your barter have checked <br> http://enbarter.com' + notification.get('redirect');
-            sendMailToUser(notification.get('user'), message, subject);
             break;
         case 'newUserWelcoming':
             notification.set('description', 'Welcome to enbarter!, start by browsing');
@@ -394,18 +389,36 @@ function createNotification(user, event, creator, objectId) {
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Congratulations completing your barter';
             message = 'Hi, <br> Congratulations completing your barter <br> http://enbarter.com' + notification.get('redirect');
-            sendMailToUser(notification.get('user'), message, subject);
             break;
         case 'finalUploaded':
             notification.set('description', 'Complete project uploaded');
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Complete project uploaded';
             message = 'Hi, <br> Complete project uploaded <br> http://enbarter.com' + notification.get('redirect');
-            sendMailToUser(notification.get('user'), message, subject);
             break;
     }
-    notification.save(null, {
-        useMasterKey: true, error: function (object, error) {
+
+
+    let query = new Parse.Query(Notification);
+    query.equalTo("user", user);
+    query.equalTo("creator", creator);
+    query.notEqualTo("read", true);
+
+    query.descending("createdAt");
+
+    query.find({
+        success: function (object) {
+            if (!object[0] || object[0].get('redirect') != notification.get('redirect')) {
+                notification.save(null, {
+                    useMasterKey: true, error: function (object, error) {
+                        console.error("Got an error " + error.code + " : " + error.message);
+                    }
+                });
+                if (message && subject)
+                    sendMailToUser(notification.get('user'), message, subject);
+            }
+        },
+        error: function (error) {
             console.error("Got an error " + error.code + " : " + error.message);
         }
     });
