@@ -398,17 +398,16 @@ function createNotification(user, event, creator, objectId) {
             break;
     }
 
-
     let query = new Parse.Query(Notification);
     query.equalTo("user", user);
     query.equalTo("creator", creator);
-    query.notEqualTo("read", true);
 
     query.descending("createdAt");
 
-    query.find({
+    query.first({
+        useMasterKey: true,
         success: function (object) {
-            if (!object[0] || object[0].get('redirect') != notification.get('redirect')) {
+            if (!object || object.get('redirect') != notification.get('redirect') || object.get('read')) {
                 notification.save(null, {
                     useMasterKey: true, error: function (object, error) {
                         console.error("Got an error " + error.code + " : " + error.message);
@@ -416,6 +415,13 @@ function createNotification(user, event, creator, objectId) {
                 });
                 if (message && subject)
                     sendMailToUser(notification.get('user'), message, subject);
+            } else {
+                object.increment('count');
+                object.save(null, {
+                    useMasterKey: true, error: function (object, error) {
+                        console.error("Got an error " + error.code + " : " + error.message);
+                    }
+                });
             }
         },
         error: function (error) {
