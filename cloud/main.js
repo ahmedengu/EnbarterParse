@@ -343,7 +343,18 @@ Parse.Cloud.beforeSave("BarterComment", function (request, response) {
     if (request.object.dirty('comment')) {
         request.object.set('comment', sanitizeIt(request.object.get('comment')));
     }
-    return response.success();
+    if (request.object.dirty('parent') && request.object.get('parent')) {
+        request.object.get('parent').add('children', request.object);
+        request.object.get('parent').save(null, {
+            useMasterKey: true,
+            success: function (object) {
+                return response.success();
+            }, error: function (object, error) {
+                console.error("Got an error " + error.code + " : " + error.message);
+            }
+        });
+    } else
+        return response.success();
 });
 
 function createNotification(user, event, creator, objectId) {
@@ -407,7 +418,7 @@ function createNotification(user, event, creator, objectId) {
     query.first({
         useMasterKey: true,
         success: function (object) {
-            if (!object || object.get('redirect') != notification.get('redirect') || object.get('read')) {
+            if (!object || object.get('read') || object.get('redirect') != notification.get('redirect') || object.get('description') != notification.get('description')) {
                 notification.save(null, {
                     useMasterKey: true, error: function (object, error) {
                         console.error("Got an error " + error.code + " : " + error.message);
