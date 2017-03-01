@@ -7,8 +7,8 @@ process.env.ALLOWED_DOMAINS = 'www.enbarter.com,enbarter.com,enbarterdev.ml,www.
 process.env.CACHE_MAXSIZE = 10000;
 process.env.CACHE_ROOT_DIR = __dirname + '/cache';
 var server = prerender({
-    workers: 4,
-    iterations: 10,
+    workers: 1,
+    iterations: 30,
     phantomBasePort: 12300,
     cookiesEnabled: true,
     logRequests: true,
@@ -18,7 +18,8 @@ var server = prerender({
     jsTimeout: 10000,
     jsCheckTimeout: 300,
     noJsExecutionTimeout: 3000,
-    evaluateJavascriptCheckTimeout: 300
+    evaluateJavascriptCheckTimeout: 300,
+    softIterations: 10
 });
 
 var cache_config = {

@@ -339,6 +339,13 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
     }
 });
 
+Parse.Cloud.beforeSave("BarterComment", function (request, response) {
+    if (request.object.dirty('comment')) {
+        request.object.set('comment', sanitizeIt(request.object.get('comment')));
+    }
+    return response.success();
+});
+
 function createNotification(user, event, creator, objectId) {
     var Notification = Parse.Object.extend("Notification");
     var notification = new Notification();
