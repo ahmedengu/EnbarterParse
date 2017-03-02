@@ -509,7 +509,7 @@ function createNotification(user, event, creator, objectId) {
 }
 
 function sendMailToUser(user, message, subject) {
-    if (user.get('email'))
+    if (user.get('email') && (!user.get('options') || user.get('options').sendEmails != false))
         sendSmtpMail({
             to: user.get('email'),
             text: message,
@@ -520,11 +520,12 @@ function sendMailToUser(user, message, subject) {
         query.get(user.id, {
                 useMasterKey: true,
                 success: function (result) {
-                    sendSmtpMail({
-                        to: result.get('email'),
-                        text: message,
-                        subject: subject
-                    });
+                    if (!user.get('options') || user.get('options').sendEmails != false)
+                        sendSmtpMail({
+                            to: result.get('email'),
+                            text: message,
+                            subject: subject
+                        });
                 },
                 error: function (object, error) {
                     console.error("Got an error " + error.code + " : " + error.message);
