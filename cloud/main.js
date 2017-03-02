@@ -520,7 +520,7 @@ function sendMailToUser(user, message, subject) {
         query.get(user.id, {
                 useMasterKey: true,
                 success: function (result) {
-                    if (!user.get('options') || user.get('options').sendEmails != false)
+                    if (!result.get('options') || result.get('options').sendEmails != false)
                         sendSmtpMail({
                             to: result.get('email'),
                             text: message,
