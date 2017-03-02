@@ -53,7 +53,7 @@ Parse.Cloud.beforeSave("_User", function (request, response) {
             request.object.set('paymentInfo', paymentInfo);
         }
     }
-    if (request.object.dirty('bio')) {
+    if (request.object.dirty('bio') && request.object.get('bio')) {
         request.object.set('bio', sanitizeIt(request.object.get('bio'), ['a', 'img', 'hr', 'iframe']));
     }
     if (request.object.isNew()) {
@@ -352,12 +352,12 @@ Parse.Cloud.afterSave("BarterComment", function (request) {
             request.object.get("parent").fetch({
                 useMasterKey: true,
                 success: function (object) {
-                    object.add('children', request.object);
-                    object.save(null, {
-                        useMasterKey: true, error: function (object, error) {
-                            console.error("Got an error " + error.code + " : " + error.message);
-                        }
-                    });
+                    // object.add('children', request.object);
+                    // object.save(null, {
+                    //     useMasterKey: true, error: function (object, error) {
+                    //         console.error("Got an error " + error.code + " : " + error.message);
+                    //     }
+                    // });
                     if (object.get('user').id != request.user.id)
                         createNotification(object.get('user'), "barterCommentReply", request.user, request.object.get("barter").id);
                 },
@@ -365,7 +365,7 @@ Parse.Cloud.afterSave("BarterComment", function (request) {
                     console.error("Got an error " + error.code + " : " + error.message);
                 }
             });
-        } else if (!request.object.get("children") && request.object.get("barter")) {
+        } else if (request.object.get("barter")) {
             request.object.get("barter").fetch({
                 useMasterKey: true,
                 success: function (object) {
