@@ -44,7 +44,7 @@ var api = new ParseServer({
     clientKey: "315b2d9b1fe6ee6808696a315b2d9b1fe6ee6808696ac17b77fbd610b49ed4b513434fd255e5a400c9b82ec17b77fbd610b49ed4b513434fd255e5a400c9b82e",
     serverURL: 'https://api.enbarterdev.ml/v1',
     liveQuery: {
-        classNames: ["BarterDashboard", "Chat", "Notification"]
+        classNames: ["BarterDashboard", "BarterChat", "Notification"]
     },
     websocketTimeout: 10 * 1000,
     cacheTimeout: 60 * 600 * 1000,

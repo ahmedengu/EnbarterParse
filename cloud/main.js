@@ -343,18 +343,65 @@ Parse.Cloud.beforeSave("BarterComment", function (request, response) {
     if (request.object.dirty('comment')) {
         request.object.set('comment', sanitizeIt(request.object.get('comment')));
     }
-    if (request.object.dirty('parent') && request.object.get('parent')) {
-        request.object.get('parent').add('children', request.object);
-        request.object.get('parent').save(null, {
-            useMasterKey: true,
-            success: function (object) {
-                return response.success();
-            }, error: function (object, error) {
+    return response.success();
+});
+
+Parse.Cloud.afterSave("BarterComment", function (request) {
+    if (!request.object.existed()) {
+        if (request.object.get('parent')) {
+            request.object.get("parent").fetch({
+                useMasterKey: true,
+                success: function (object) {
+                    object.add('children', request.object);
+                    object.save(null, {
+                        useMasterKey: true, error: function (object, error) {
+                            console.error("Got an error " + error.code + " : " + error.message);
+                        }
+                    });
+                    createNotification(object.get('user'), "barterCommentReply", request.user, request.object.get("barter").id);
+                },
+                error: function (error) {
+                    console.error("Got an error " + error.code + " : " + error.message);
+                }
+            });
+        } else if (!request.object.get("children") && request.object.get("barter")) {
+            request.object.get("barter").fetch({
+                useMasterKey: true,
+                success: function (object) {
+                    createNotification(object.get('user'), "barterComment", request.user, request.object.get("barter").id);
+                },
+                error: function (error) {
+                    console.error("Got an error " + error.code + " : " + error.message);
+                }
+            });
+        }
+    }
+});
+
+
+Parse.Cloud.beforeSave("Message", function (request, response) {
+    if (request.object.dirty('message')) {
+        request.object.set('message', sanitizeIt(request.object.get('message')));
+    }
+    return response.success();
+
+});
+
+Parse.Cloud.afterSave("Message", function (request) {
+    if (!request.object.existed()) {
+        request.object.get('messageThread').set('lastMessage', request.object);
+        request.object.get('messageThread').save(null, {
+            useMasterKey: true, error: function (object, error) {
                 console.error("Got an error " + error.code + " : " + error.message);
             }
         });
-    } else
-        return response.success();
+    }
+});
+
+Parse.Cloud.afterSave("MessageThread", function (request) {
+    if (!request.object.existed()) {
+        createNotification(request.object.get("to"), "MessageThread", request.user, request.object.get("to").id);
+    }
 });
 
 function createNotification(user, event, creator, objectId) {
@@ -406,6 +453,24 @@ function createNotification(user, event, creator, objectId) {
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Complete project uploaded';
             message = 'Hi, <br> Complete project uploaded <br> http://enbarter.com' + notification.get('redirect');
+            break;
+        case 'barterComment':
+            notification.set('description', 'You got a new comment on your barter');
+            notification.set("redirect", '/barter/' + objectId);
+            subject = 'You got a new comment on your barter';
+            message = 'Hi, <br> You got a new comment on your barter <br> http://enbarter.com' + notification.get('redirect');
+            break;
+        case 'barterCommentReply':
+            notification.set('description', 'You got a new comment reply');
+            notification.set("redirect", '/barter/' + objectId);
+            subject = 'You got a new comment reply';
+            message = 'Hi, <br> You got a new comment reply <br> http://enbarter.com' + notification.get('redirect');
+            break;
+        case 'MessageThread':
+            notification.set('description', 'You got a new conversation');
+            notification.set("redirect", '/messages/' + objectId);
+            subject = 'You got a new conversation';
+            message = 'Hi, <br> You got a new conversation <br> http://enbarter.com' + notification.get('redirect');
             break;
     }
 
