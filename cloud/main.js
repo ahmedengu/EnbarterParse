@@ -46,11 +46,15 @@ Parse.Cloud.beforeSave("_User", function (request, response) {
                 membership = request.original.get('membership');
             request.object.set('membership', membership);
         }
-        if (request.object.dirty('paymentInfo')) {
-            paymentInfo = null;
-            if (request.original)
-                paymentInfo = request.original.get('paymentInfo');
-            request.object.set('paymentInfo', paymentInfo);
+
+        let restricted = ['paymentInfo', 'rate', 'rateCount', 'emailVerified'];
+        for (let key of restricted) {
+            if (request.object.dirty(key)) {
+                value = null;
+                if (request.original)
+                    value = request.original.get(key);
+                request.object.set(key, value);
+            }
         }
     }
     if (request.object.dirty('bio') && request.object.get('bio')) {

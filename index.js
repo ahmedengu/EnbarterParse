@@ -52,14 +52,16 @@ var api = new ParseServer({
     revokeSessionOnPasswordReset: true,
     allowClientClassCreation: false,
     enableAnonymousUsers: false,
-    sessionLength: 2592000,
+    sessionLength: 31104000,
     verifyUserEmails: true,
-    emailVerifyTokenValidityDuration: 24 * 60 * 60,
+    userSensitiveFields: ['email', 'paymentInfo'],
+    preventLoginWithUnverifiedEmail: true,
+    emailVerifyTokenValidityDuration: 172800,
     passwordPolicy: {
         validatorPattern: /^(?=.{8,})/,
         maxPasswordAge: 1000,
         maxPasswordHistory: 5,
-        resetTokenValidityDuration: 24 * 60 * 60,
+        resetTokenValidityDuration: 86400,
         doNotAllowUsername: true
     },
     auth: {
@@ -68,7 +70,7 @@ var api = new ParseServer({
         }
     },
     accountLockout: {
-        duration: 5,
+        duration: 15,
         threshold: 3
     },
     filesAdapter: {
