@@ -47,7 +47,7 @@ Parse.Cloud.beforeSave("_User", function (request, response) {
             request.object.set('membership', membership);
         }
 
-        let restricted = ['paymentInfo', 'rate', 'rateCount', 'emailVerified'];
+        let restricted = ['paymentInfo', 'rate', 'rateCount', 'emailVerified', 'favors'];
         for (let key of restricted) {
             if (request.object.dirty(key)) {
                 value = null;
@@ -82,7 +82,9 @@ Parse.Cloud.afterSave("_User", function (request) {
 
 function checkRequired(request) {
     var dirtyKeys = request.object.dirtyKeys();
-    var required = ['barterTitle', 'offerCategory', 'offerDescription', 'offerMilestones', 'offerDeadline', 'seekCategory', 'seekDescription', 'seekDeadline', 'user', 'state', 'words'];
+    var required = ['barterTitle', 'offerCategory', 'seekCategory', 'seekDescription', 'seekDeadline', 'user', 'state', 'words'];
+    if (!request.object.has('offerFavor'))
+        required.push('offerDeadline', 'offerMilestones', 'offerDescription');
     var errors = "";
     for (var i = 0; i < required.length; i++) {
         if (dirtyKeys.indexOf(required[i]) == -1)
@@ -462,13 +464,13 @@ function createNotification(user, event, creator, objectId) {
             break;
         case 'barterComment':
             notification.set('description', 'You got a new comment on your barter');
-            notification.set("redirect", '/barter/' + objectId);
+            notification.set("redirect", '/barter/' + objectId + '#qna');
             subject = 'You got a new comment on your barter';
             message = 'Hi, <br> You got a new comment on your barter <br> http://enbarter.com' + notification.get('redirect');
             break;
         case 'barterCommentReply':
             notification.set('description', 'You got a new comment reply');
-            notification.set("redirect", '/barter/' + objectId);
+            notification.set("redirect", '/barter/' + objectId + 'qna');
             subject = 'You got a new comment reply';
             message = 'Hi, <br> You got a new comment reply <br> http://enbarter.com' + notification.get('redirect');
             break;
