@@ -138,7 +138,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
         paddleLog.save(null, {
             useMasterKey: true,
             success: function (result) {
-                res.send({result: 200});
+                res.send({result: 'ok'});
 
                 if (result.get('user')) {
                     if (['subscription_created', 'payment_succeeded', 'subscription_payment_succeeded', 'subscription_updated'].indexOf(result.get('alert_name')) != -1) {
@@ -160,36 +160,45 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                         paymentInfo.set('update_url', result.get('update_url'));
                                     if (result.get('subscription_id'))
                                         paymentInfo.set('subscription_id', result.get('subscription_id'));
+                                    if (result.get('status'))
+                                        paymentInfo.set('status', result.get('status'));
+                                    paymentInfo.addUnique('paddleLogs', result);
                                     paymentInfo.set('user', result.get('user'));
                                     paymentInfo.set('membership', results[0]);
-                                    result.get('user').set('paymentInfo', paymentInfo);
-                                    result.set('paymentInfo', paymentInfo)
-                                    result.get('user').save(null, {
-                                        useMasterKey: true,
-                                        success: function (user) {
-                                            console.log({
-                                                action: "set membership to " + results[0].id,
-                                                user: user.id
-                                            });
-                                            let text = 'hi,<br>Thank you for your payment,';
+                                    paymentInfo.save(null, {
+                                        useMasterKey: true, success: function (paymentInfo) {
+                                            result.get('user').set('paymentInfo', paymentInfo);
+                                            result.set('paymentInfo', paymentInfo);
+                                            result.get('user').save(null, {
+                                                useMasterKey: true,
+                                                success: function (user) {
+                                                    console.log({
+                                                        action: "set membership to " + results[0].id,
+                                                        user: user.id
+                                                    });
+                                                    let text = 'hi,<br>Thank you for your payment,';
 
-                                            if (result.get('receipt_url'))
-                                                text += '<br>Receipt link: ' + result.get('receipt_url');
-                                            if (result.get('cancel_url'))
-                                                text += ' <br>Cancellation link: ' + result.get('cancel_url');
-                                            if (result.get('update_url'))
-                                                text += ' <br> Update link: ' + result.get('update_url');
-                                            text += '<br>Event: ' + result.get('alert_name');
-                                            sendSmtpMail({
-                                                to: user.get('email'),
-                                                text: text,
-                                                subject: 'Premium Subscription'
+                                                    if (result.get('receipt_url'))
+                                                        text += '<br>Receipt link: ' + result.get('receipt_url');
+                                                    if (result.get('cancel_url'))
+                                                        text += ' <br>Cancellation link: ' + result.get('cancel_url');
+                                                    if (result.get('update_url'))
+                                                        text += ' <br> Update link: ' + result.get('update_url');
+                                                    text += '<br>Event: ' + result.get('alert_name');
+                                                    sendSmtpMail({
+                                                        to: user.get('email'),
+                                                        text: text,
+                                                        subject: 'Premium Subscription'
+                                                    });
+                                                    result.save(null, {
+                                                        useMasterKey: true
+                                                    });
+                                                },
+                                                error: function (object, error) {
+                                                    console.error("Got an error " + error.code + " : " + error.message);
+                                                }
                                             });
-                                            result.save(null, {
-                                                useMasterKey: true
-                                            });
-                                        },
-                                        error: function (object, error) {
+                                        }, error: function (object, error) {
                                             console.error("Got an error " + error.code + " : " + error.message);
                                         }
                                     });
