@@ -605,3 +605,54 @@ Parse.Cloud.job("sitemapGenerator", function (request, status) {
         status.error("Got an error " + error.code + " : " + error.message);
     });
 });
+
+Parse.Cloud.define("changeSubscription", function (request, response) {
+    if (!request.user)
+        return response.error("You not logged in");
+
+    let query = new Parse.Query(Parse.User);
+    query.include('paymentInfo');
+    query.get(request.user.id, {
+        useMasterKey: true,
+        success: function (result) {
+            if (!result.get('paymentInfo'))
+                return response.error("You dont have a paid subscription");
+
+            let query = new Parse.Query("Membership");
+            query.get(request.params.membership, {
+                useMasterKey: true,
+                success: function (membership) {
+                    Parse.Cloud.httpRequest({
+                        method: 'POST',
+                        url: 'https://vendors.paddle.com/api/2.0/subscription/users/move',
+                        body: {
+                            vendor_id: '17807',
+                            vendor_auth_code: '40926e842ab8d995239b9e05fa5c47cd6ee1145eaa7a883d34',
+                            subscription_id: result.get('paymentInfo').get('subscription_id'),
+                            plan_id: membership.get('productId')
+                        }
+                    }).then(function (httpResponse) {
+                        console.log(httpResponse.text);
+                        let object = JSON.parse(httpResponse.text);
+                        if (object.success)
+                            return response.success('Success');
+                        else
+                            return response.error('Failed: ' + object.error.message);
+                    }, function (httpResponse) {
+                        console.error('Request failed with response code ' + httpResponse.status);
+                        return response.error('Request failed');
+                    });
+                },
+                error: function (object, error) {
+                    console.error("Got an error " + error.code + " : " + error.message);
+                    return response.error('Membership fetch failed');
+                }
+            });
+        },
+        error: function (object, error) {
+            console.error("Got an error " + error.code + " : " + error.message);
+            return response.error('User fetch failed');
+        }
+    });
+
+});

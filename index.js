@@ -141,7 +141,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                 res.send({result: 200});
 
                 if (result.get('user')) {
-                    if (['subscription_created', 'payment_succeeded', 'subscription_payment_succeeded'].indexOf(result.get('alert_name')) != -1) {
+                    if (['subscription_created', 'payment_succeeded', 'subscription_payment_succeeded', 'subscription_updated'].indexOf(result.get('alert_name')) != -1) {
                         let Membership = Parse.Object.extend("Membership");
                         var queryMembership = new Parse.Query(Membership);
                         queryMembership.equalTo('productId', result.get('product_id') || result.get('subscription_plan_id'));
@@ -161,6 +161,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                     if (result.get('subscription_id'))
                                         paymentInfo.set('subscription_id', result.get('subscription_id'));
                                     paymentInfo.set('user', result.get('user'));
+                                    paymentInfo.set('membership', results[0]);
                                     result.get('user').set('paymentInfo', paymentInfo);
                                     result.set('paymentInfo', paymentInfo)
                                     result.get('user').save(null, {
