@@ -65,6 +65,10 @@ Parse.Cloud.beforeSave("_User", function (request, response) {
             "__type": "Pointer", "className": "Membership",
             "objectId": "G0wH0oBAyF"
         });
+        request.object.set('favors', [{
+            "count": 1,
+            "favor": {"__type": "Pointer", "className": "Favor", "objectId": "W7cjBZuI39"}
+        }]);
     } else {
         if (request.object.dirty('pic') && request.original.get('pic') && request.object.get('pic')) {
             fs.unlink(__dirname + '/../files/' + request.original.get('pic').name(), function () {
@@ -129,9 +133,11 @@ Parse.Cloud.beforeSave("BarterDashboard", function (request, response) {
     }
     return response.success();
 });
+
 function checkLimits(request, response, callback) {
     let query = new Parse.Query(Parse.User);
     query.include('membership');
+    query.include('favors.favor');
     query.get(request.user.id, {
             useMasterKey: true,
             success: function (result) {
@@ -172,6 +178,56 @@ function checkLimits(request, response, callback) {
                             success: function (results) {
                                 if (results.length >= result.get('membership').get('activeLimit'))
                                     return response.error('Sorry you have exceeded your active limit');
+
+                                if (request.object.dirty('offerFavor') && request.object.get('offerFavor')) {
+                                    let flag = true;
+                                    for (let index in  result.get('favors')) {
+                                        let favor = result.get('favors')[index];
+                                        if (favor.favor.objectId == request.object.get('offerFavor').id && favor.count > 0) {
+                                            flag = false;
+                                            favor.count--;
+                                            result.save(null, {
+                                                useMasterKey: true,
+                                                error: function (object, error) {
+                                                    console.error("Got an error " + error.code + " : " + error.message);
+                                                }
+                                            });
+                                            break;
+                                        }
+                                    }
+                                    if (flag)
+                                        return response.error('Sorry you dont have enough favors');
+                                }
+
+                                if (request.object.dirty('barterRequests') && request.object.get('barterRequests')) {
+                                    let barterRequests = request.object.get('barterRequests');
+
+                                    for (let indexj in barterRequests) {
+                                        if (barterRequests[indexj].user.id == result.id) {
+                                            if (barterRequests[indexj].favor) {
+                                                let flag = true;
+                                                for (let index in  result.get('favors')) {
+                                                    let favor = result.get('favors')[index];
+                                                    if (favor.favor.objectId == barterRequests[indexj].favor.id && favor.count > 0) {
+                                                        flag = false;
+                                                        favor.count--;
+                                                        result.save(null, {
+                                                            useMasterKey: true,
+                                                            error: function (object, error) {
+                                                                console.error("Got an error " + error.code + " : " + error.message);
+                                                            }
+                                                        });
+                                                        break;
+                                                    }
+                                                }
+                                                if (flag)
+                                                    return response.error('Sorry you dont have enough favors');
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+
                                 callback(function () {
                                     if (request.object.dirty('offerDescription')) {
                                         request.object.set('offerDescription', sanitizeIt(request.object.get('offerDescription')));
@@ -201,6 +257,45 @@ function checkLimits(request, response, callback) {
         }
     );
 }
+function incrementFavorCount(userId, favorId) {
+    let query = new Parse.Query(Parse.User);
+    query.include('favors.favor');
+    query.get(userId, {
+        useMasterKey: true,
+        success: function (result) {
+            let flag = true;
+            for (let index in  result.get('favors')) {
+                let favor = result.get('favors')[index];
+                if (favor.favor.objectId == favorId) {
+                    flag = false;
+                    favor.count++;
+                    break;
+                }
+            }
+            if (flag) {
+                let favorObject = {
+                    "count": 1,
+                    "favor": {
+                        "__type": "Pointer",
+                        "className": "Favor",
+                        "objectId": favorId
+                    }
+                };
+                result.addUnique('favors', favorObject);
+            }
+            result.save(null, {
+                useMasterKey: true,
+                error: function (object, error) {
+                    console.error("Got an error " + error.code + " : " + error.message);
+                }
+            });
+        },
+        error: function (error) {
+            console.error("Got an error " + error.code + " : " + error.message);
+        }
+    });
+}
+
 Parse.Cloud.beforeSave("Barter", function (request, response) {
     if (request.object.isNew()) {
         checkLimits(request, response, function (callback) {
@@ -210,7 +305,7 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             }
             callback();
         });
-    } else {
+    } else if (!request.master) {
         if (!request.user || ((request.user.id != request.object.get('user').id && (request.object.get('barterUpUser') && request.user.id != request.object.get('barterUpUser').id)) && !(request.object.dirtyKeys().length == 0 || (request.object.dirtyKeys().length == 1 && request.object.dirty('barterRequests'))))) {
             return response.error("Not Authorized");
         }
@@ -341,8 +436,34 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
         if (request.object.dirty('seekDescription')) {
             request.object.set('seekDescription', sanitizeIt(request.object.get('seekDescription')));
         }
+        if (request.object.dirty('state')) {
+            if (request.object.get('state') == 'disabled') {
+                if (request.original.get('offerFavor')) {
+                    incrementFavorCount(request.original.get('user').id, request.original.get('offerFavor').id);
+                }
+            }
+            if (request.object.get('state') == 'disabled' || request.object.get('state') == 'bartered') {
+                let barterRequests = request.object.get('barterRequests');
+
+                for (let indexj in barterRequests) {
+                    if (!request.object.get('barterUpUser') || barterRequests[indexj].user.id != request.object.get('barterUpUser').id) {
+                        if (barterRequests[indexj].favor) {
+                            incrementFavorCount(barterRequests[indexj].user.id, barterRequests[indexj].favor.id);
+                        }
+                    }
+                }
+            } else if (request.object.get('state') == 'completed') {
+                if (request.original.get('offerFavor')) {
+                    incrementFavorCount(request.original.get('barterUpUser').id, request.original.get('offerFavor').id);
+                } else if (request.original.get('barterUpFavor')) {
+                    incrementFavorCount(request.original.get('user').id, request.original.get('barterUpFavor').id);
+                }
+            }
+
+        }
         return response.success();
-    }
+    } else
+        return response.success();
 });
 
 Parse.Cloud.beforeSave("BarterComment", function (request, response) {

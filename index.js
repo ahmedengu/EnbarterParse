@@ -35,7 +35,7 @@ var sendSmtpMail = require('simple-parse-smtp-adapter')(smtpOptions).sendMail;
 var api = new ParseServer({
     appName: 'Enbarter',
     publicServerURL: 'https://api.enbarterdev.ml/v1',
-    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@localhost:27017/enbarterDB',
+    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@82.196.12.219:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
     javascriptKey: 'Ad06@!30',
@@ -99,6 +99,12 @@ app.get('/', function (req, res) {
 app.post('/paddleWebhook', function (req, res) {
     let params = req.body;
     let signature = params.p_signature;
+    if (!signature) {
+        res.status(500).send({
+            "error": "invalid signature"
+        });
+        return;
+    }
     delete params.p_signature;
     let serialize = Serialize.serialize(Object.keys(params).sort().reduce((r, k) => (r[k] = params[k], r), {}));
     const verify = crypto.createVerify('RSA-SHA1');
