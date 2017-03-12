@@ -266,7 +266,7 @@ function incrementFavorCount(userId, favorId) {
             let flag = true;
             for (let index in  result.get('favors')) {
                 let favor = result.get('favors')[index];
-                if (favor.favor.objectId == favorId) {
+                if ((favor.favor.objectId || favor.favor.id) == favorId) {
                     flag = false;
                     favor.count++;
                     break;
