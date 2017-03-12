@@ -65,10 +65,10 @@ Parse.Cloud.beforeSave("_User", function (request, response) {
             "__type": "Pointer", "className": "Membership",
             "objectId": "G0wH0oBAyF"
         });
-        request.object.set('favors', [{
-            "count": 1,
-            "favor": {"__type": "Pointer", "className": "Favor", "objectId": "W7cjBZuI39"}
-        }]);
+        request.object.addUnique('favors', {
+            count: 1,
+            favor: {__type: "Pointer", className: "Favor", objectId: "W7cjBZuI39"}
+        });
     } else {
         if (request.object.dirty('pic') && request.original.get('pic') && request.object.get('pic')) {
             fs.unlink(__dirname + '/../files/' + request.original.get('pic').name(), function () {
@@ -183,7 +183,7 @@ function checkLimits(request, response, callback) {
                                     let flag = true;
                                     for (let index in  result.get('favors')) {
                                         let favor = result.get('favors')[index];
-                                        if (favor.favor.objectId == request.object.get('offerFavor').id && favor.count > 0) {
+                                        if ((favor.favor.objectId || favor.favor.id) == request.object.get('offerFavor').id && favor.count > 0) {
                                             flag = false;
                                             favor.count--;
                                             result.save(null, {
@@ -208,7 +208,7 @@ function checkLimits(request, response, callback) {
                                                 let flag = true;
                                                 for (let index in  result.get('favors')) {
                                                     let favor = result.get('favors')[index];
-                                                    if (favor.favor.objectId == barterRequests[indexj].favor.id && favor.count > 0) {
+                                                    if ((favor.favor.objectId || favor.favor.id) == barterRequests[indexj].favor.id && favor.count > 0) {
                                                         flag = false;
                                                         favor.count--;
                                                         result.save(null, {
@@ -347,9 +347,18 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             });
             if (request.original.get('barterUpRate')) {
                 request.object.set('state', 'completed');
+                var acl = new Parse.ACL();
+                acl.setPublicWriteAccess(false);
+                acl.setPublicReadAccess(true);
+                request.object.setACL(acl);
             }
             if (request.object.dirty('state') && request.object.get('state') == 'completed') {
                 request.original.get('barterDashboard').set('state', 'completed');
+                var acl = new Parse.ACL();
+                acl.setPublicWriteAccess(false);
+                acl.setPublicReadAccess(true);
+                request.original.get('barterDashboard').setACL(acl);
+
                 request.original.get('barterDashboard').save(null, {
                     useMasterKey: true,
                     error: function (object, error) {
@@ -381,9 +390,18 @@ Parse.Cloud.beforeSave("Barter", function (request, response) {
             });
             if (request.original.get('offerRate')) {
                 request.object.set('state', 'completed');
+                var acl = new Parse.ACL();
+                acl.setPublicWriteAccess(false);
+                acl.setPublicReadAccess(true);
+                request.object.setACL(acl);
             }
             if (request.object.dirty('state') && request.object.get('state') == 'completed') {
                 request.original.get('barterDashboard').set('state', 'completed');
+                var acl = new Parse.ACL();
+                acl.setPublicWriteAccess(false);
+                acl.setPublicReadAccess(true);
+                request.original.get('barterDashboard').setACL(acl);
+
                 request.original.get('barterDashboard').save(null, {
                     useMasterKey: true,
                     error: function (object, error) {
@@ -591,7 +609,7 @@ function createNotification(user, event, creator, objectId) {
             break;
         case 'barterCommentReply':
             notification.set('description', 'You got a new comment reply');
-            notification.set("redirect", '/barter/' + objectId + 'qna');
+            notification.set("redirect", '/barter/' + objectId + '#qna');
             subject = 'You got a new comment reply';
             message = 'Hi, <br> You got a new comment reply ';
             break;
