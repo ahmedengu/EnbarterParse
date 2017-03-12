@@ -546,26 +546,26 @@ function createNotification(user, event, creator, objectId) {
             notification.set("redirect", '/profile');
 
             subject = 'You got a new rate';
-            message = 'Hi, <br> You got a new rate <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> You got a new rate <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'barterRequests':
             notification.set('description', 'You got a new barter request');
             notification.set("redirect", '/barter/' + objectId);
             subject = 'You got a new barter request';
-            message = 'Hi, <br> You got a new barter request <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> You got a new barter request <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'barterUpUser':
             notification.set('description', 'Your barter request accepted go to dashboard');
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Your barter request accepted go to dashboard';
-            message = 'Hi, <br> Your barter request accepted go to dashboard <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> Your barter request accepted go to dashboard <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'barterUpMilestones':
         case 'offerMilestones':
             notification.set('description', 'Your barter have checked');
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Your barter have checked';
-            message = 'Hi, <br> Your barter have checked <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> Your barter have checked <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'newUserWelcoming':
             notification.set('description', 'Welcome to enbarter!, start by browsing');
@@ -575,31 +575,31 @@ function createNotification(user, event, creator, objectId) {
             notification.set('description', 'Congratulations completing your barter');
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Congratulations completing your barter';
-            message = 'Hi, <br> Congratulations completing your barter <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> Congratulations completing your barter <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'finalUploaded':
             notification.set('description', 'Complete project uploaded');
             notification.set("redirect", '/dashboard/barter/' + objectId);
             subject = 'Complete project uploaded';
-            message = 'Hi, <br> Complete project uploaded <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> Complete project uploaded <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'barterComment':
             notification.set('description', 'You got a new comment on your barter');
             notification.set("redirect", '/barter/' + objectId + '#qna');
             subject = 'You got a new comment on your barter';
-            message = 'Hi, <br> You got a new comment on your barter <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> You got a new comment on your barter <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'barterCommentReply':
             notification.set('description', 'You got a new comment reply');
             notification.set("redirect", '/barter/' + objectId + 'qna');
             subject = 'You got a new comment reply';
-            message = 'Hi, <br> You got a new comment reply <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> You got a new comment reply <br> http://enbarter.com/notifications#' + notification.id;
             break;
         case 'MessageThread':
             notification.set('description', 'You got a new conversation');
             notification.set("redirect", '/messages/' + objectId);
             subject = 'You got a new conversation';
-            message = 'Hi, <br> You got a new conversation <br> http://enbarter.com' + notification.get('redirect');
+            message = 'Hi, <br> You got a new conversation <br> http://enbarter.com/notifications#' + notification.id;
             break;
     }
 

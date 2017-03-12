@@ -214,7 +214,7 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                     } else if (['payment_refunded', 'subscription_cancelled', 'subscription_payment_refunded'].indexOf(result.get('alert_name')) != -1) {
                         result.get('user').set('membership', {
                             "__type": "Pointer", "className": "Membership",
-                            "objectId": "G0wH0oBAyF"
+                            "objectId": "fQcewB3856"
                         });
                         result.get('user').unset('paymentInfo');
 
