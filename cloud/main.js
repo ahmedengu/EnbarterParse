@@ -560,64 +560,64 @@ function createNotification(user, event, creator, objectId) {
     var subject, message;
     switch (event) {
         case 'rate':
-            notification.set("description", "You got a new rate");
+            notification.set("description", "You just Got a New Rating!");
             notification.set("redirect", '/profile');
 
-            subject = 'You got a new rate';
-            message = 'Hi, <br> You got a new rate ';
+            subject = 'You just got a new rating';
+            message = 'Hi, <br> Someone just gave you a new rating! Check it out! ';
             break;
         case 'barterRequests':
-            notification.set('description', 'You got a new barter request');
+            notification.set('description', 'You Got a New Barter Request');
             notification.set("redirect", '/barter/' + objectId);
-            subject = 'You got a new barter request';
-            message = 'Hi, <br> You got a new barter request ';
+            subject = 'You Got a New Barter Request';
+            message = 'Hi, <br> A new barter request comes your way!  ';
             break;
         case 'barterUpUser':
-            notification.set('description', 'Your barter request accepted go to dashboard');
+            notification.set('description', 'Your Barter Request is Accepted! To the Dashboard!');
             notification.set("redirect", '/dashboard/barter/' + objectId);
-            subject = 'Your barter request accepted go to dashboard';
-            message = 'Hi, <br> Your barter request accepted go to dashboard ';
+            subject = 'Your Barter Request is Accepted! To the Dashboard!';
+            message = 'Hi, <br> A barter request you recently made has been accepted! ';
             break;
         case 'barterUpMilestones':
         case 'offerMilestones':
-            notification.set('description', 'Your barter have checked');
+            notification.set('description', 'A Milestone has been Checked!');
             notification.set("redirect", '/dashboard/barter/' + objectId);
-            subject = 'Your barter have checked';
-            message = 'Hi, <br> Your barter have checked ';
+            subject = 'A Milestone has been Checked!';
+            message = 'Hi, <br> A milestone on one of your barters has been checked! ';
             break;
         case 'newUserWelcoming':
-            notification.set('description', 'Welcome to enbarter!, start by browsing');
+            notification.set('description', 'Welcome to Enbarter! Start by Browsing!');
             notification.set("redirect", '/browse');
             break;
         case 'barterCompleted':
-            notification.set('description', 'Congratulations completing your barter');
+            notification.set('description', 'Congratulations on Completing your Barter!');
             notification.set("redirect", '/dashboard/barter/' + objectId);
-            subject = 'Congratulations completing your barter';
-            message = 'Hi, <br> Congratulations completing your barter ';
+            subject = 'Congratulations on Completing your Barter!';
+            message = 'Hi, <br> You have just completed a barter! Congratulations! ';
             break;
         case 'finalUploaded':
-            notification.set('description', 'Complete project uploaded');
+            notification.set('description', 'Complete Project Uploaded!');
             notification.set("redirect", '/dashboard/barter/' + objectId);
-            subject = 'Complete project uploaded';
-            message = 'Hi, <br> Complete project uploaded ';
+            subject = 'Complete Project Uploaded';
+            message = 'Hi, <br> Congratulations! The complete project has been uploaded! ';
             break;
         case 'barterComment':
-            notification.set('description', 'You got a new comment on your barter');
+            notification.set('description', 'A New Comment has been Posted on your Barter!');
             notification.set("redirect", '/barter/' + objectId + '#qna');
-            subject = 'You got a new comment on your barter';
-            message = 'Hi, <br> You got a new comment on your barter ';
+            subject = 'You Got a New Comment on your Barter!';
+            message = 'Hi, <br> Someone commented on your barter! ';
             break;
         case 'barterCommentReply':
-            notification.set('description', 'You got a new comment reply');
+            notification.set('description', 'You Got a New Reply!');
             notification.set("redirect", '/barter/' + objectId + '#qna');
-            subject = 'You got a new comment reply';
-            message = 'Hi, <br> You got a new comment reply ';
+            subject = 'You Got a New Reply on a Comment!';
+            message = 'Hi, <br> Someone replied to your comment! ';
             break;
         case 'MessageThread':
-            notification.set('description', 'You got a new conversation');
+            notification.set('description', 'You Received a New Message!');
             notification.set("redirect", '/messages/' + objectId);
-            subject = 'You got a new conversation';
-            message = 'Hi, <br> You got a new conversation ';
+            subject = 'You Received a New Message';
+            message = 'Hi, <br> Someone sent you a new message! ';
             break;
     }
 
@@ -672,7 +672,7 @@ function sendMailToUser(user, message, subject) {
                         sendSmtpMail({
                             to: result.get('email'),
                             text: message,
-                            subject: subject
+                            subject: "Enbarter Notification " + subject
                         });
                 },
                 error: function (object, error) {
