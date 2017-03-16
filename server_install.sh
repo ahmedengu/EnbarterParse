@@ -87,6 +87,13 @@ requirepass 16b5c2300edd0a70b824714fea0e8144e177c888e0ef0977a0b77943d525ef6c
 
 
 https://www.digitalocean.com/community/tutorials/how-to-add-swap-on-ubuntu-14-04
+
+mongodump --db enbarterDB --host 82.196.12.219 --port 27017  --username enbarterUser --password 1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe
+
+mongodump --db 4914e11730ef4c059cfb2976d7eea681 --host mongodb3.back4app.com --port 27017  --username admin --password SFps27ZmdR9l7NV34Er1yzGP
+
+mongorestore --db enbarterDB --host 82.196.12.219 --port 27017  --username enbarterUser --password 1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe /srv/db/dump/4914e11730ef4c059cfb2976d7eea681
+
 "
 
 

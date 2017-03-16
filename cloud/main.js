@@ -164,7 +164,7 @@ function checkLimits(request, response, callback) {
                 mainQuery.find({
                     success: function (results) {
                         if (results.length >= result.get('membership').get('monthlyUnits'))
-                            return response.error('Sorry you have exceeded your monthly limit');
+                            return response.error('Sorry you have exceeded your monthly limit, Would you like to upgrade your plan to increase the limit check the prices here: http://enbarter.com/prices');
 
                         let queryBarter1 = new Parse.Query("Barter");
                         queryBarter1.equalTo('user', request.user);
@@ -177,7 +177,7 @@ function checkLimits(request, response, callback) {
                         mainQuery.find({
                             success: function (results) {
                                 if (results.length >= result.get('membership').get('activeLimit'))
-                                    return response.error('Sorry you have exceeded your active limit');
+                                    return response.error('Sorry you have exceeded your active limit, Would you like to upgrade your plan to increase the limit check the prices here: http://enbarter.com/prices');
 
                                 if (request.object.dirty('offerFavor') && request.object.get('offerFavor')) {
                                     let flag = true;
