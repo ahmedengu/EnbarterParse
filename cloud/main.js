@@ -13,26 +13,30 @@ var sanitizeHtml = require('sanitize-html');
 const fs = require('fs');
 
 function sanitizeIt(html, removeTag) {
-    let options = {
-        allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub', 'span'],
-        allowedAttributes: {
-            a: ['href', 'name', 'target', 'src'],
-            img: ['src']
-        },
-        selfClosing: ['img', 'br', 'hr', 'link'],
-        allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
-        allowedSchemesByTag: {
-            img: ['http', 'https', 'data']
-        },
-        allowProtocolRelative: true, allowedClasses: {
-            a: ['aWrapper'],
-            span: ['glyphicon', 'glyphicon-play-circle', 'playBtn']
+    if (html) {
+        let options = {
+            allowedTags: ['p', 'a', 'img', 'b', 'i', 'u', 'strike', 'strike', 'sup', 'hr', 'br', 'sub', 'span'],
+            allowedAttributes: {
+                a: ['href', 'name', 'target', 'src'],
+                img: ['src']
+            },
+            selfClosing: ['img', 'br', 'hr', 'link'],
+            allowedSchemes: ['http', 'https', 'ftp', 'mailto'],
+            allowedSchemesByTag: {
+                img: ['http', 'https', 'data']
+            },
+            allowProtocolRelative: true, allowedClasses: {
+                a: ['aWrapper'],
+                span: ['glyphicon', 'glyphicon-play-circle', 'playBtn']
+            }
+        };
+        for (let tag of removeTag || []) {
+            options.allowedTags = options.allowedTags.filter(i => i !== tag);
         }
-    };
-    for (let tag of removeTag || []) {
-        options.allowedTags = options.allowedTags.filter(i => i !== tag);
-    }
-    return sanitizeHtml(html, options);
+        return sanitizeHtml(html, options);
+    } else
+        return html;
+
 }
 
 Parse.Cloud.beforeSave("_User", function (request, response) {
