@@ -1,12 +1,12 @@
 var sendSmtpMail = require('simple-parse-smtp-adapter')({
-    fromAddress: 'Enbarter <no-reply@enbarterdev.ml>',
-    user: 'no-reply@enbarterdev.ml',
+    fromAddress: 'Enbarter <no-reply@enbarter.com>',
+    user: 'no-reply@enbarter.com',
     password: 'cba2321ce58c9bd28e8b7b1d3e6fde24a194c485cd94b7c21e736041487bab80',
-    host: 'enbarterdev.ml',
+    host: 'enbarter.com',
     isSSL: true,
     port: 465,
     isTlsRejectUnauthorized: false,
-    name: 'enbarterdev.ml',
+    name: 'enbarter.com',
     emailField: 'email'
 }).sendMail;
 var sanitizeHtml = require('sanitize-html');

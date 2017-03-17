@@ -11,14 +11,14 @@ const Serialize = require('php-serialize');
 
 const crypto = require('crypto');
 let smtpOptions = {
-    fromAddress: 'Enbarter <no-reply@enbarterdev.ml>',
-    user: 'no-reply@enbarterdev.ml',
+    fromAddress: 'Enbarter <no-reply@enbarter.com>',
+    user: 'no-reply@enbarter.com',
     password: 'cba2321ce58c9bd28e8b7b1d3e6fde24a194c485cd94b7c21e736041487bab80',
-    host: 'enbarterdev.ml',
+    host: 'enbarter.com',
     isTlsRejectUnauthorized: false,
     isSSL: true, //True or false if you are using ssl
     port: 465, //SSL port or another port
-    name: 'enbarterdev.ml', //  optional, used for identifying to the server
+    name: 'enbarter.com', //  optional, used for identifying to the server
     emailField: 'email',
     templates: {
         resetPassword: {
@@ -34,15 +34,15 @@ let smtpOptions = {
 var sendSmtpMail = require('simple-parse-smtp-adapter')(smtpOptions).sendMail;
 var api = new ParseServer({
     appName: 'Enbarter',
-    publicServerURL: 'https://api.enbarterdev.ml/v1',
-    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@82.196.12.219:27017/enbarterDB',
+    publicServerURL: 'https://api.enbarter.com/v1',
+    databaseURI: 'mongodb://enbarterUser:1d9bd5d441415fc6556acb447b97903f1623d16fd9d56fe@localhost:27017/enbarterDB',
     cloud: __dirname + '/cloud/main.js',
     appId: 'EnbarterApp',
     javascriptKey: 'Ad06@!30',
     masterKey: 'fb4b98ea158cbbdd32c366682f280533d89374a2fa8908186b4478ff295b96f77096f54eabc9a61b956237d817fb04ea6498c73c4cd9ec14e1ade7cc81136b0',
     restAPIKey: "1df92f3ebeb37b888c55ea9edd4fedf63a718ddf63a718d73a0556fb473a0556fb49d5cdde63c567dc31df92f3ebeb37b888c55ea9edd4fe9d5cdde63c567dc3",
     clientKey: "315b2d9b1fe6ee6808696a315b2d9b1fe6ee6808696ac17b77fbd610b49ed4b513434fd255e5a400c9b82ec17b77fbd610b49ed4b513434fd255e5a400c9b82e",
-    serverURL: 'https://api.enbarterdev.ml/v1',
+    serverURL: 'https://api.enbarter.com/v1',
     liveQuery: {
         classNames: ["BarterDashboard", "BarterChat", "Notification"]
     },
@@ -144,8 +144,6 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
         paddleLog.save(null, {
             useMasterKey: true,
             success: function (result) {
-                res.send({result: 'ok'});
-
                 if (result.get('user')) {
                     if (['subscription_created', 'payment_succeeded', 'subscription_payment_succeeded', 'subscription_updated'].indexOf(result.get('alert_name')) != -1) {
                         let Membership = Parse.Object.extend("Membership");
@@ -155,33 +153,34 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                             useMasterKey: true,
                             success: function (results) {
                                 if (results[0]) {
-                                    result.get('user').set('membership', results[0]);
-                                    var PaymentInfo = Parse.Object.extend("PaymentInfo");
-                                    let paymentInfo = result.get('user').get("paymentInfo") || new PaymentInfo();
-                                    if (result.get('receipt_url'))
-                                        paymentInfo.set('receipt_url', result.get('receipt_url'));
-                                    if (result.get('cancel_url'))
-                                        paymentInfo.set('cancel_url', result.get('cancel_url'));
-                                    if (result.get('update_url'))
-                                        paymentInfo.set('update_url', result.get('update_url'));
-                                    if (result.get('subscription_id'))
-                                        paymentInfo.set('subscription_id', result.get('subscription_id'));
-                                    if (result.get('status'))
-                                        paymentInfo.set('status', result.get('status'));
-                                    paymentInfo.addUnique('paddleLogs', result);
-                                    paymentInfo.set('user', result.get('user'));
-                                    paymentInfo.set('membership', results[0]);
-                                    paymentInfo.save(null, {
-                                        useMasterKey: true, success: function (paymentInfo) {
-                                            result.get('user').set('paymentInfo', paymentInfo);
-                                            result.set('paymentInfo', paymentInfo);
-                                            result.get('user').save(null, {
-                                                useMasterKey: true,
-                                                success: function (user) {
+                                    query.include('paymentInfo');
+                                    query.get(result.get('user').id, {
+                                        useMasterKey: true,
+                                        success: function (user) {
+                                            user.set('membership', results[0]);
+                                            var PaymentInfo = Parse.Object.extend("PaymentInfo");
+                                            let paymentInfo = user.get("paymentInfo") || new PaymentInfo();
+                                            if (result.get('receipt_url'))
+                                                paymentInfo.set('receipt_url', result.get('receipt_url'));
+                                            if (result.get('cancel_url'))
+                                                paymentInfo.set('cancel_url', result.get('cancel_url'));
+                                            if (result.get('update_url'))
+                                                paymentInfo.set('update_url', result.get('update_url'));
+                                            if (result.get('subscription_id'))
+                                                paymentInfo.set('subscription_id', result.get('subscription_id'));
+                                            if (result.get('status'))
+                                                paymentInfo.set('status', result.get('status'));
+                                            paymentInfo.add('paddleLogs', result);
+                                            paymentInfo.set('user', user);
+                                            paymentInfo.set('membership', results[0]);
+                                            user.set('paymentInfo', paymentInfo);
+                                            user.save(null, {
+                                                useMasterKey: true, success: function (user) {
                                                     console.log({
                                                         action: "set membership to " + results[0].id,
                                                         user: user.id
                                                     });
+                                                    res.send({result: 'ok'});
                                                     let text = 'hi,<br>Thank you for your payment,';
 
                                                     if (result.get('receipt_url'))
@@ -194,17 +193,18 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                                                     sendSmtpMail({
                                                         to: user.get('email'),
                                                         text: text,
-                                                        subject: 'Premium Subscription'
+                                                        subject: 'Enbarter Subscription'
                                                     });
+                                                    result.set('paymentInfo', paymentInfo);
                                                     result.save(null, {
                                                         useMasterKey: true
                                                     });
-                                                },
-                                                error: function (object, error) {
+                                                }, error: function (object, error) {
                                                     console.error("Got an error " + error.code + " : " + error.message);
                                                 }
                                             });
-                                        }, error: function (object, error) {
+                                        },
+                                        error: function (object, error) {
                                             console.error("Got an error " + error.code + " : " + error.message);
                                         }
                                     });
@@ -212,23 +212,24 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                             }
                         });
                     } else if (['payment_refunded', 'subscription_cancelled', 'subscription_payment_refunded'].indexOf(result.get('alert_name')) != -1) {
+                        result.get('user').unset('paymentInfo');
                         result.get('user').set('membership', {
                             "__type": "Pointer", "className": "Membership",
                             "objectId": "fQcewB3856"
                         });
-                        result.get('user').unset('paymentInfo');
 
                         result.get('user').save(null, {
                             useMasterKey: true,
                             success: function (user) {
                                 console.log({
-                                    action: "set membership to G0wH0oBAyF",
+                                    action: "set membership to fQcewB3856",
                                     user: user.id
                                 });
+                                res.send({result: 'ok'});
                                 sendSmtpMail({
                                     to: user.get('email'),
                                     text: 'hi,<br>Your subscription cancel succeeded.<br>Event: ' + result.get('alert_name'),
-                                    subject: 'Premium Subscription Cancelled'
+                                    subject: 'Enbarter Subscription Cancelled'
                                 });
                             },
                             error: function (object, error) {
@@ -236,7 +237,8 @@ tnDEYqcgG95GHkjG6TUfshECAwEAAQ==
                             }
                         });
                     }
-                }
+                } else
+                    res.send({result: 'ok'});
             },
             error: function (object, error) {
                 console.error("Got an error " + error.code + " : " + error.message);
