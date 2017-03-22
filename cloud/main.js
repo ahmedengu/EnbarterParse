@@ -538,17 +538,6 @@ Parse.Cloud.beforeSave("Message", function (request, response) {
 
 });
 
-Parse.Cloud.afterSave("Message", function (request) {
-    if (!request.object.existed()) {
-        request.object.get('messageThread').set('lastMessage', request.object.get('message').replace(/(<([^>]+)>)/ig, "").substring(0, 100) || '');
-        request.object.get('messageThread').save(null, {
-            useMasterKey: true, error: function (object, error) {
-                console.error("Got an error " + error.code + " : " + error.message);
-            }
-        });
-    }
-});
-
 Parse.Cloud.afterSave("MessageThread", function (request) {
     if (!request.object.existed()) {
         createNotification(request.object.get("to"), "MessageThread", request.user, request.object.get("to").id);
