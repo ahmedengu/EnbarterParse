@@ -91,7 +91,7 @@ app.use(mountPath, api);
 
 app.get('/', function (req, res) {
     res.writeHead(301,
-        {Location: 'http://enbarter.com/'}
+        {Location: 'https://enbarter.com/'}
     );
     res.end();
 });
