@@ -1,0 +1,109 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "parse-server-another-smtp",
+        "scope": null,
+        "escapedName": "parse-server-another-smtp",
+        "name": "parse-server-another-smtp",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "C:\\Users\\ahmedengu\\IdeaProjects\\EnbarterParse"
+    ]
+  ],
+  "_from": "parse-server-another-smtp@latest",
+  "_id": "parse-server-another-smtp@2.2.0",
+  "_inCache": true,
+  "_location": "/parse-server-another-smtp",
+  "_nodeVersion": "4.5.0",
+  "_npmOperationalInternal": {
+    "host": "packages-12-west.internal.npmjs.com",
+    "tmp": "tmp/parse-server-another-smtp-2.2.0.tgz_1481917761085_0.07638508710078895"
+  },
+  "_npmUser": {
+    "name": "sebsylvester",
+    "email": "sebastianwijkhuizen@gmail.com"
+  },
+  "_npmVersion": "2.15.9",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "parse-server-another-smtp",
+    "scope": null,
+    "escapedName": "parse-server-another-smtp",
+    "name": "parse-server-another-smtp",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "http://registry.npmjs.org/parse-server-another-smtp/-/parse-server-another-smtp-2.2.0.tgz",
+  "_shasum": "2046cc77ecbf5a2bf54b3fbef92457b0c4d52525",
+  "_shrinkwrap": null,
+  "_spec": "parse-server-another-smtp",
+  "_where": "C:\\Users\\ahmedengu\\IdeaProjects\\EnbarterParse",
+  "author": {
+    "name": "Sebastian Sylvester"
+  },
+  "bugs": {
+    "url": "https://github.com/sebsylvester/parse-server-another-smtp/issues"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.20.0",
+    "co": "^4.6.0",
+    "lodash.template": "^4.4.0",
+    "mailcomposer": "^4.0.0",
+    "nodemailer": "^2.5.0"
+  },
+  "description": "SMTP adapter for Parse Server apps",
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.20.0",
+    "babel-preset-es2015": "^6.18.0",
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "sinon": "^1.17.6"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "2046cc77ecbf5a2bf54b3fbef92457b0c4d52525",
+    "tarball": "https://registry.npmjs.org/parse-server-another-smtp/-/parse-server-another-smtp-2.2.0.tgz"
+  },
+  "engines": {
+    "node": ">=4.5"
+  },
+  "files": [
+    "src",
+    "lib",
+    "test"
+  ],
+  "gitHead": "334d96cb0ad40b25f6799182328527e89fdaf82a",
+  "homepage": "https://github.com/sebsylvester/parse-server-another-smtp",
+  "keywords": [
+    "parse",
+    "parse-server",
+    "email-adapter"
+  ],
+  "license": "MIT",
+  "maintainers": [
+    {
+      "name": "sebsylvester",
+      "email": "sebastianwijkhuizen@gmail.com"
+    }
+  ],
+  "name": "parse-server-another-smtp",
+  "optionalDependencies": {},
+  "peerDependencies": {
+    "parse-server": "^2.3.1"
+  },
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebsylvester/parse-server-another-smtp.git"
+  },
+  "version": "2.2.0"
+}

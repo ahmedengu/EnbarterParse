@@ -50,7 +50,7 @@ var api = new ParseServer({
     cacheTimeout: 60 * 600 * 1000,
     logLevel: 'VERBOSE',
     revokeSessionOnPasswordReset: true,
-    allowClientClassCreation: false,
+    allowClientClassCreation: true,
     enableAnonymousUsers: false,
     sessionLength: 31104000,
     verifyUserEmails: true,
